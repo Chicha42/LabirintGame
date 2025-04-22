@@ -13,6 +13,7 @@ namespace LabirintGame
         {
             ApplicationConfiguration.Initialize();
             Application.Run(new MainForm());
+            Console.WriteLine("Hello, World!");
         }
     }
 }
