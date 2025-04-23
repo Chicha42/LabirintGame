@@ -9,7 +9,7 @@ namespace LabirintGame.View
     public partial class MainForm : Form
     {
         private readonly GameController _controller;
-        private const int CellSize = 45;
+        private const int CellSize = 145;
 
         public MainForm()
         {
@@ -30,10 +30,10 @@ namespace LabirintGame.View
             int dx = 0, dy = 0;
             switch (e.KeyCode)
             {
-                case Keys.W: dy = -1; break;
-                case Keys.S: dy = 1; break;
-                case Keys.A: dx = -1; break;
-                case Keys.D: dx = 1; break;
+                case Keys.W: dy = 1; break;
+                case Keys.S: dy = -1; break;
+                case Keys.A: dx = 1; break;
+                case Keys.D: dx = -1; break;
             }
 
             _controller.MovePlayer(dx, dy);
@@ -43,26 +43,31 @@ namespace LabirintGame.View
         {
             var maze = _controller.Maze;
             var player = _controller.Player;
-            Graphics g = e.Graphics;
-            g.Clear(Color.White);
+            var (startX, startY, endX, endY) = maze.GetCameraBounds(player.X, player.Y);
+            var g = e.Graphics;
+            g.Clear(Color.DarkGray);
 
             int mazePixelWidth = maze.Width * CellSize;
             int mazePixelHeight = maze.Height * CellSize;
+            
+            int centerX = ClientSize.Width / 2;
+            int centerY = ClientSize.Height / 2;
 
             int offsetX = (ClientSize.Width - mazePixelWidth) / 2;
             int offsetY = (ClientSize.Height - mazePixelHeight) / 2;
+            
 
-            var Keys = maze.Keys;
-            var Doors = maze.Doors;
-
-            for (int y = 0; y < maze.Height; y++)
+            for (int y = startY; y <= endY; y++)
             {
-                for (int x = 0; x < maze.Width; x++)
+                for (int x = startX; x <= endX; x++)
                 {
+                    int screenX = centerX - (x - player.X) * CellSize - CellSize / 2;
+                    int screenY = centerY - (y - player.Y) * CellSize - CellSize / 2;
                     Brush brush = maze.Grid[y, x] switch
                     {
                         0 => Brushes.Black,
                         1 => Brushes.White,
+                        3 => Brushes.Green,
                         10 => Brushes.Red,
                         9 => Brushes.Green,
                         8 => Brushes.Blue,
@@ -73,38 +78,17 @@ namespace LabirintGame.View
                         
                     };
 
-                    Rectangle rect = new Rectangle(offsetX + x * CellSize, offsetY + y * CellSize, CellSize, CellSize);
-
-                    if (maze.Grid[y, x] == 2)
-                        g.FillEllipse(brush, rect);
-                    else
-                        g.FillRectangle(brush, rect);
+                    Rectangle rect = new Rectangle(screenX, screenY, CellSize, CellSize);
+                    
+                    g.FillRectangle(brush, rect);
                 }
             }
 
             g.FillEllipse(Brushes.Red,
-                offsetX + player.X * CellSize + CellSize / 4,
-                offsetY + player.Y * CellSize + CellSize / 4,
+                centerX - CellSize / 4,
+                centerY - CellSize / 4,
                 CellSize / 2, CellSize / 2);
-
-            g.FillRectangle(Brushes.Green,
-                offsetX + (maze.Width - 2) * CellSize,
-                offsetY + (maze.Height - 2) * CellSize,
-                CellSize, CellSize);
-            g.FillRectangle(
-                Brushes.Black,
-                offsetX + (maze.Width - 1) * CellSize,
-                offsetY + (maze.Height - 2) * CellSize,
-                CellSize,
-                CellSize
-            );
-            g.FillRectangle(
-                Brushes.Black,
-                offsetX + (maze.Width - 2) * CellSize,
-                offsetY + (maze.Height - 1) * CellSize,
-                CellSize,
-                CellSize
-            );
+            
         }
     }
 }

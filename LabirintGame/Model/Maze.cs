@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace LabirintGame.Model
 {
     public class Maze
@@ -9,10 +5,10 @@ namespace LabirintGame.Model
         public int[,] Grid { get; private set; }
         public int Width { get; }
         public int Height { get; }
-        private Random _random = new Random();
+        private readonly Random _random = new Random();
 
-        public readonly List<Key> Keys = new();
-        public readonly List<Door> Doors = new();
+        public readonly List<Key> Keys = [];
+        public readonly List<Door> Doors = [];
         
         public readonly Dictionary<int, Color> KeyColors = new Dictionary<int, Color>()
         {
@@ -22,7 +18,7 @@ namespace LabirintGame.Model
             
         };
 
-        public static readonly Dictionary<int, Color> DoorColors = new Dictionary<int, Color>()
+        private static readonly Dictionary<int, Color> DoorColors = new Dictionary<int, Color>()
         {
             {0, Color.DarkRed},
             {1, Color.DarkGreen},
@@ -60,30 +56,38 @@ namespace LabirintGame.Model
             PlaceKeysAndDoors(Keys, Doors);
 
             Grid[0, 1] = 1;
+            Grid[Height - 2, Width - 2] = 3;
+            Grid[Height - 2, Width - 1] = 0;
+            Grid[Height - 1, Width - 2] = 0;
             
-            /*var finishDoor = new Door(Color.Purple, Width - 2, Height - 2);
-            Doors.Add(finishDoor);
-            Keys.Add(new Key(numKeys - 1, path[3].x, path[3].y)); // Ensure final key is accessible
-            Grid[path[3].y, path[3].x] = 2;
-            Grid[Height - 2, Width - 2] = 3;*/
+            
         }
         
         private void PlaceKeysAndDoors(List<Key> keys, List<Door> doors)
         {
             var emptyCells = new List<(int x, int y)>();
 
-            for (int y = 1; y < Height - 1; y++)
+            for (int y = 5; y < Height - 5; y++)
             {
-                for (int x = 1; x < Width - 1; x++)
+                for (int x = 5; x < Width - 5; x++)
                 {
                     if (Grid[y, x] == 1)
                         emptyCells.Add((x, y));
                 }
             }
 
-            emptyCells = emptyCells.OrderBy(_ => _random.Next()).ToList().Slice(0, 7);
+            emptyCells = emptyCells.OrderBy(_ => _random.Next()).ToList();
+            var cells = new List<(int x, int y)>();
             
-            var cellsWithDistances = emptyCells
+            foreach (var (x,y) in emptyCells)
+            {
+                if ((CountWallsAround(x, y) == 2 && cells.Count < 3) || (CountWallsAround(x, y) >= 2 && cells.Count >= 3))
+                    cells.Add((x, y));
+
+                if (cells.Count == 6) break;
+            }
+            
+            var cellsWithDistances = cells
                 .Select(cell => new
                 {
                     cell.x,
@@ -219,5 +223,15 @@ namespace LabirintGame.Model
 
         private bool InBounds(int x, int y)
             => x > 0 && y > 0 && x < Width - 1 && y < Height - 1;
+
+        public (int startX, int startY, int endX, int endY) GetCameraBounds(int playerX, int playerY, int radius = 3)
+        {
+            var startX = Math.Max(0, playerX - radius);
+            var startY = Math.Max(0, playerY - radius);
+            var endX = Math.Min(Width-1, playerX + radius);
+            var endY = Math.Min(Height-1, playerY + radius);
+            
+            return (startX,startY,endX,endY); 
+        }
     }
 }

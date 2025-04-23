@@ -26,3 +26,18 @@ D:\Projects\Rider Projects C#\LabirintGame — копия\LabirintGame\obj\Debug
 D:\Projects\Rider Projects C#\LabirintGame — копия\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.pdb
 D:\Projects\Rider Projects C#\LabirintGame — копия\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.genruntimeconfig.cache
 D:\Projects\Rider Projects C#\LabirintGame — копия\LabirintGame\obj\Debug\net8.0-windows\ref\LabirintGame.dll
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.exe
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.deps.json
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.runtimeconfig.json
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.dll
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.pdb
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.AssemblyInfoInputs.cache
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.AssemblyInfo.cs
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.csproj.CoreCompileInputs.cache
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.sourcelink.json
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.dll
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\refint\LabirintGame.dll
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.pdb
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.genruntimeconfig.cache
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\ref\LabirintGame.dll
