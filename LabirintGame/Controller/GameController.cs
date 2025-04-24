@@ -7,11 +7,22 @@ namespace LabirintGame.Controller
     {
         private readonly GameModel _model;
         private readonly MainForm _view;
+        private DateTime _lastUpdateTime;
+        
+        // Позиция камеры (может быть дробной)
+        public float CameraX { get; private set; }
+        public float CameraY { get; private set; }
+        private const float CameraFollowSpeed = 5f; // Скорость следования камеры
 
         public GameController(MainForm view)
         {
             _view = view;
             _model = new GameModel(21, 21, 4);
+            _lastUpdateTime = DateTime.Now;
+            
+            // Инициализируем камеру на позиции игрока
+            CameraX = _model.Player.DrawX;
+            CameraY = _model.Player.DrawY;
         }
 
         public Maze Maze => _model.Maze;
@@ -30,5 +41,29 @@ namespace LabirintGame.Controller
 
             _view.Invalidate();
         }
+        
+        public void Update()
+        {
+            var now = DateTime.Now;
+            float deltaTime = (float)(now - _lastUpdateTime).TotalSeconds;
+            _lastUpdateTime = now;
+            
+            // Обновляем позицию игрока
+            _model.Player.Update(deltaTime);
+            
+            // Плавно перемещаем камеру к игроку
+            CameraX = Lerp(CameraX, _model.Player.DrawX, CameraFollowSpeed * deltaTime);
+            CameraY = Lerp(CameraY, _model.Player.DrawY, CameraFollowSpeed * deltaTime);
+            
+            _view.Invalidate();
+        }
+
+        private float Lerp(float a, float b, float t)
+        {
+            return a + (b - a) * Math.Clamp(t, 0, 1);
+        }
+        
+        
+
     }
 }

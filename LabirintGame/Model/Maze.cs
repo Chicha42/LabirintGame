@@ -59,8 +59,6 @@ namespace LabirintGame.Model
             Grid[Height - 2, Width - 2] = 3;
             Grid[Height - 2, Width - 1] = 0;
             Grid[Height - 1, Width - 2] = 0;
-            
-            
         }
         
         private void PlaceKeysAndDoors(List<Key> keys, List<Door> doors)
