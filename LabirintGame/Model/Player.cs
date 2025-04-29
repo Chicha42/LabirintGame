@@ -5,13 +5,13 @@ namespace LabirintGame.Model
     public class Player : Pos
     {
         public int Health { get; set; }
-        private Maze _maze;
-        public List<Key> CollectedKeys = new List<Key>();
+        private readonly Maze _maze;
+        private readonly List<Key> CollectedKeys;
         public float DrawX { get; private set; }
         public float DrawY { get; private set; }
         private bool _isMoving;
         private float _moveProgress;
-        private const float MoveDuration = 0.1f; // время перемещения между клетками в секундах
+        private const float MoveDuration = 0.1f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
         
 
@@ -27,7 +27,7 @@ namespace LabirintGame.Model
 
         public void Move(int deltaX, int deltaY)
         {
-            if (_isMoving) return; // Игнорируем новые движения, пока текущее не завершено
+            if (_isMoving) return;
             
             int newX = X + deltaX;
             int newY = Y + deltaY;
@@ -86,7 +86,6 @@ namespace LabirintGame.Model
                 Y = _moveData.toY;
             }
 
-            // Плавная интерполяция между начальной и конечной позицией
             DrawX = Lerp(_moveData.fromX, _moveData.toX, _moveProgress);
             DrawY = Lerp(_moveData.fromY, _moveData.toY, _moveProgress);
         }

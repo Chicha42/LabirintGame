@@ -8,11 +8,11 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace LabirintGame.View
 {
-    public partial class MainForm : Form
+    public sealed partial class MainForm : Form
     {
         private readonly GameController _controller;
-        private const int CellSize = 145;
-        Timer timer = new Timer();
+        private const int CellSize = 200;
+        private readonly Timer _timer = new Timer();
 
         public MainForm()
         {
@@ -27,17 +27,17 @@ namespace LabirintGame.View
 
             Paint += MainForm_Paint;
             
-            timer.Interval = 16; // ~60 FPS
-            timer.Tick += (_, _) =>
+            _timer.Interval = 10;
+            _timer.Tick += (_, _) =>
             {
                 _controller.Update();
                 Invalidate();
             };
-            timer.Start();
+            _timer.Start();
 
         }
 
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        private void MainForm_KeyDown(object? sender, KeyEventArgs e)
         {
             int dx = 0, dy = 0;
             switch (e.KeyCode)
@@ -51,39 +51,23 @@ namespace LabirintGame.View
             _controller.MovePlayer(dx, dy);
         }
 
-        private void MainForm_Paint(object sender, PaintEventArgs e)
+        private void MainForm_Paint(object? sender, PaintEventArgs e)
         {
             var maze = _controller.Maze;
-            var player = _controller.Player;
             var g = e.Graphics;
             g.Clear(Color.DarkGray);
             
-            int centerX = ClientSize.Width / 2;
-            int centerY = ClientSize.Height / 2;
+            var centerX = ClientSize.Width / 2;
+            var centerY = ClientSize.Height / 2;
             
-            // Получаем границы видимой области относительно камеры
-            int visibleCellsX = (int)Math.Ceiling(ClientSize.Width / (float)CellSize) + 2;
-            int visibleCellsY = (int)Math.Ceiling(ClientSize.Height / (float)CellSize) + 2;
+            var (startX, startY, endX, endY) = GetVisibleBounds(maze);
             
-            int startX = (int)Math.Floor(_controller.CameraX - visibleCellsX / 2f);
-            int startY = (int)Math.Floor(_controller.CameraY - visibleCellsY / 2f);
-            int endX = startX + visibleCellsX;
-            int endY = startY + visibleCellsY;
-            
-            // Корректируем границы, чтобы не выходить за пределы лабиринта
-            startX = Math.Max(0, startX);
-            startY = Math.Max(0, startY);
-            endX = Math.Min(maze.Width - 1, endX);
-            endY = Math.Min(maze.Height - 1, endY);
-            
-            // Отрисовываем видимую часть лабиринта
             for (int y = startY; y <= endY; y++)
             {
                 for (int x = startX; x <= endX; x++)
                 {
-                    // Позиция клетки на экране с учетом дробной части камеры
-                    float screenX = centerX - (x - _controller.CameraX) * CellSize;
-                    float screenY = centerY - (y - _controller.CameraY) * CellSize;
+                    var screenX = centerX - (x - _controller.CameraX) * CellSize;
+                    var screenY = centerY - (y - _controller.CameraY) * CellSize;
                     
                     Brush brush = maze.Grid[y, x] switch
                     {
@@ -109,11 +93,26 @@ namespace LabirintGame.View
                 }
             }
 
-            // Отрисовываем игрока в центре экрана
             g.FillEllipse(Brushes.Red,
                 centerX - CellSize / 4,
                 centerY - CellSize / 4,
                 CellSize / 2, CellSize / 2);
+        }
+
+        private (int startX, int startY, int endX, int endY) GetVisibleBounds(Maze maze)
+        {
+            var visibleCellsX = (int)Math.Ceiling(ClientSize.Width / (float)CellSize) + 2;
+            var visibleCellsY = (int)Math.Ceiling(ClientSize.Height / (float)CellSize) + 2;
+            
+            var startX = (int)Math.Floor(_controller.CameraX - visibleCellsX / 2f);
+            var startY = (int)Math.Floor(_controller.CameraY - visibleCellsY / 2f);
+            var endX = startX + visibleCellsX;
+            var endY = startY + visibleCellsY;
+            
+            return (Math.Max(0, startX),
+                Math.Max(0, startY), 
+                Math.Min(maze.Width - 1, endX),
+                Math.Min(maze.Height - 1, endY));
         }
     }
 }

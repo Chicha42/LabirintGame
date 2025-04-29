@@ -7,8 +7,8 @@ namespace LabirintGame.Model
         public int Height { get; }
         private readonly Random _random = new Random();
 
-        public readonly List<Key> Keys = [];
-        public readonly List<Door> Doors = [];
+        private readonly List<Key> _keys = [];
+        private readonly List<Door> _doors = [];
         
         public readonly Dictionary<int, Color> KeyColors = new Dictionary<int, Color>()
         {
@@ -32,28 +32,28 @@ namespace LabirintGame.Model
             Grid = new int[height, width];
             for (var i = 0; i < numKeys-1; i++)
             {
-                Keys.Add(new Key(i, KeyColors[i], 0, 0));
-                Doors.Add(new Door(i,DoorColors[i], 0, 0));
+                _keys.Add(new Key(i, KeyColors[i], 0, 0));
+                _doors.Add(new Door(i,DoorColors[i], 0, 0));
             }
-            GenerateMazeWithKeysAndDoors(numKeys);
+            GenerateMazeWithKeysAndDoors();
         }
 
-        private void GenerateMazeWithKeysAndDoors(int numKeys)
+        private void GenerateMazeWithKeysAndDoors()
         {
-            for (int y = 0; y < Height; y++)
-                for (int x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
+                for (var x = 0; x < Width; x++)
                     Grid[y, x] = 0;
 
             var path = new List<(int x, int y)>();
             var visited = new bool[Height, Width];
-            DFS(Width - 2, Height - 2, path, visited);
+            Dfs(Width - 2, Height - 2, path, visited);
 
             foreach (var (x, y) in path)
                 Grid[y, x] = 1;
 
             AddBranches(path, 15);
 
-            PlaceKeysAndDoors(Keys, Doors);
+            PlaceKeysAndDoors(_keys, _doors);
 
             Grid[0, 1] = 1;
             Grid[Height - 2, Width - 2] = 3;
@@ -90,7 +90,7 @@ namespace LabirintGame.Model
                 {
                     cell.x,
                     cell.y,
-                    distance = GetDistanceBFS(1, 0, cell.x, cell.y)
+                    distance = GetDistanceBfs(1, 0, cell.x, cell.y)
                 })
                 .OrderBy(cell => cell.distance)
                 .ToList();
@@ -139,7 +139,7 @@ namespace LabirintGame.Model
             return count;
         }
 
-        private void DFS(int x, int y, List<(int x, int y)> path, bool[,] visited)
+        private void Dfs(int x, int y, List<(int x, int y)> path, bool[,] visited)
         {
             visited[y, x] = true;
             path.Add((x, y));
@@ -155,12 +155,12 @@ namespace LabirintGame.Model
                 if (InBounds(nx, ny) && !visited[ny, nx])
                 {
                     Grid[y + dy / 2, x + dx / 2] = 1;
-                    DFS(nx, ny, path, visited);
+                    Dfs(nx, ny, path, visited);
                 }
             }
         }
         
-        private int GetDistanceBFS(int startX, int startY, int targetX, int targetY)
+        private int GetDistanceBfs(int startX, int startY, int targetX, int targetY)
         {
             int[,] distances = new int[Height, Width];
             bool[,] visited = new bool[Height, Width];
@@ -222,14 +222,5 @@ namespace LabirintGame.Model
         private bool InBounds(int x, int y)
             => x > 0 && y > 0 && x < Width - 1 && y < Height - 1;
 
-        public (int startX, int startY, int endX, int endY) GetCameraBounds(int playerX, int playerY, int radius = 3)
-        {
-            var startX = Math.Max(0, playerX - radius);
-            var startY = Math.Max(0, playerY - radius);
-            var endX = Math.Min(Width-1, playerX + radius);
-            var endY = Math.Min(Height-1, playerY + radius);
-            
-            return (startX,startY,endX,endY); 
-        }
     }
 }
