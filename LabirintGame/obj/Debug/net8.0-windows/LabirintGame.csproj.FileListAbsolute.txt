@@ -42,3 +42,18 @@ C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.pdb
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.genruntimeconfig.cache
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\obj\Debug\net8.0-windows\ref\LabirintGame.dll
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.exe
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.deps.json
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.runtimeconfig.json
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.dll
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.pdb
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.AssemblyInfoInputs.cache
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.AssemblyInfo.cs
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.csproj.CoreCompileInputs.cache
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.sourcelink.json
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.dll
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\refint\LabirintGame.dll
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.pdb
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.genruntimeconfig.cache
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\ref\LabirintGame.dll

@@ -221,6 +221,21 @@ namespace LabirintGame.Model
 
         private bool InBounds(int x, int y)
             => x > 0 && y > 0 && x < Width - 1 && y < Height - 1;
+        
+        public readonly Random Random = new Random();
 
+        public List<(int x, int y)> GetEmptyCells()
+        {
+            var cells = new List<(int x, int y)>();
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    if (Grid[y, x] == 1 && !(x == 1 && y == 0))
+                        cells.Add((x, y));
+                }
+            }
+            return cells;
+        }
     }
 }

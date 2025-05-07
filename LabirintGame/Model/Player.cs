@@ -11,7 +11,7 @@ namespace LabirintGame.Model
         public float DrawY { get; private set; }
         private bool _isMoving;
         private float _moveProgress;
-        private const float MoveDuration = 0.1f;
+        private const float MoveDuration = 0.25f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
         
 
@@ -29,47 +29,68 @@ namespace LabirintGame.Model
         {
             if (_isMoving) return;
             
-            int newX = X + deltaX;
-            int newY = Y + deltaY;
-
-            if (CanMoveTo(newX, newY))
+            bool canMoveX = CanMoveTo(X + deltaX, Y);
+            bool canMoveY = CanMoveTo(X, Y + deltaY);
+            
+            if (deltaX != 0 && deltaY != 0)
             {
-                _moveData = (X, Y, newX, newY);
-                _isMoving = true;
-                _moveProgress = 0f;
+                if (!canMoveX && !canMoveY) return;
+                if (!canMoveX) deltaX = 0;
+                if (!canMoveY) deltaY = 0;
             }
-            CheckForCollectables(newY, newX);
+
+            if (deltaX != 0 || deltaY != 0)
+            {
+                int newX = X + deltaX;
+                int newY = Y + deltaY;
+
+                if(!InBounds(newX,newY)) return;
+                
+                if (CanMoveTo(newX, newY))
+                {
+                    _moveData = (X, Y, newX, newY);
+                    _isMoving = true;
+                    _moveProgress = 0f;
+                }
+                CheckForCollectables(deltaY, deltaX);
+            }
+            
         }
 
-        private void CheckForCollectables(int newY, int newX)
+        private void CheckForCollectables(int dy, int dx)
         {
-            if (_maze.Grid[newY, newX] == 10 ||
-                _maze.Grid[newY, newX] == 9 ||
-                _maze.Grid[newY, newX] == 8)
+            if (_maze.Grid[Y, X] == 10 ||
+                _maze.Grid[Y, X] == 9 ||
+                _maze.Grid[Y, X] == 8)
             {
-                CollectedKeys.Add(new Key(_maze.Grid[newY, newX], 
-                    _maze.KeyColors[_maze.Grid[newY, newX]-8], newX, newY));
-                _maze.Grid[newY, newX] = 1;
+                CollectedKeys.Add(new Key(_maze.Grid[Y, X], 
+                    _maze.KeyColors[_maze.Grid[Y, X]-8], X, Y));
+                _maze.Grid[Y, X] = 1;
             }
 
-            if (_maze.Grid[newY, newX] == 20 ||
-                _maze.Grid[newY, newX] == 19 ||
-                _maze.Grid[newY, newX] == 18)
+            if (_maze.Grid[Y + dy, X + dx] == 20 ||
+                _maze.Grid[Y + dy, X + dx] == 19 ||
+                _maze.Grid[Y + dy, X + dx] == 18)
             {
-                for (var i = 0;i < CollectedKeys.Count; i++)
-                    if (CollectedKeys[i].Id +10 ==  _maze.Grid[newY, newX])
-                        _maze.Grid[newY, newX] = 1;
+                foreach (var t in CollectedKeys.Where(t => t.Id +10 ==  _maze.Grid[Y + dy, X + dx]))
+                    _maze.Grid[Y + dy, X + dx] = 1;
             }
         }
 
         private bool CanMoveTo(int x, int y)
         {
             return x >= 0 && y >= 0 &&
-                x < _maze.Width && y < _maze.Height &&
+                x < _maze.Width-1 && y < _maze.Height-1 &&
                 _maze.Grid[y, x] != 0 &&
                 _maze.Grid[y, x] != 20 &&
                 _maze.Grid[y, x] != 19 &&
                 _maze.Grid[y, x] != 18;
+        }
+        
+        private bool InBounds(int x, int y)
+        {
+            return x >= 0 && y >= 0 &&
+                   x < _maze.Width - 1 && y < _maze.Height - 1;
         }
 
         public void Update(float deltaTime)
