@@ -5,7 +5,7 @@ namespace LabirintGame.Model
     public class Player : Pos
     {
         public int Health { get; set; }
-        private readonly Maze _maze;
+        private static Maze _maze;
         private readonly List<Key> CollectedKeys;
         public float DrawX { get; private set; }
         public float DrawY { get; private set; }

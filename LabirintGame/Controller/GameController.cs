@@ -54,8 +54,8 @@ namespace LabirintGame.Controller
                 _model.Player.Y == _model.Maze.Height - 2)
             {
                 _isGameOver = true;
-                System.Windows.Forms.MessageBox.Show("Вы победили!");
-                _view.BeginInvoke(new Action(() => System.Windows.Forms.Application.Exit()));
+                MessageBox.Show("Вы победили!");
+                _view.BeginInvoke(new Action(() => Application.Exit()));
             }
 
             _view.Invalidate();
@@ -144,6 +144,7 @@ namespace LabirintGame.Controller
                 }
             }
         }
+        
         private bool CanSeePlayer(Enemy e)
         {
             if (e.X == Player.X)
@@ -204,8 +205,7 @@ namespace LabirintGame.Controller
             path.Reverse();
             return path;
         }
-
-
+        
         private static float Lerp(float a, float b, float t)
         {
             return a + (b - a) * Math.Clamp(t, 0, 1);

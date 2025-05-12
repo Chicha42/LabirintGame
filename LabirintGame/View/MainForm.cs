@@ -16,6 +16,17 @@ namespace LabirintGame.View
         private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
         private Bitmap wall, floor, blueKey;
         private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
+        
+        //Анимация главного героя
+        private Bitmap _playerSpriteSheet;
+        private const int SpriteSize = 32;
+        private const int FramesPerDirection = 4;
+        private int _animationFrame = 0;
+        private int _animationTick = 0;
+        private const int FrameChangeRate = 6;
+        private bool _isPlayerMoving = false;
+        private int _playerDirection = 0;
+
     
         public MainForm()
         {   
@@ -28,6 +39,8 @@ namespace LabirintGame.View
             _tileTextures[TileType.Wall] = LoadTexture("Assets/wall.png");
             _tileTextures[TileType.Floor] = LoadTexture("Assets/floor.png");
             _tileTextures[TileType.KeyBlue] = LoadTexture("Assets/key.png");
+            _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
+
 
             _controller = new GameController(this, 3);
 
@@ -37,13 +50,33 @@ namespace LabirintGame.View
             _timer.Tick += (_, _) =>
             {
                 int dx = 0, dy = 0;
-                if (_wPressed) dy = 1;
-                if (_sPressed) dy = -1;
-                if (_aPressed) dx = 1;
-                if (_dPressed) dx = -1;
+                if (_wPressed)
+                {
+                    dy = 1;
+                    _playerDirection = 1;
+                }
+
+                if (_sPressed)
+                {
+                    dy = -1;
+                    _playerDirection = 0;
+                }
+
+                if (_aPressed)
+                {
+                    dx = 1;
+                    _playerDirection = 3;
+                }
+
+                if (_dPressed)
+                {
+                    dx = -1;
+                    _playerDirection = 2;
+                }
                 if (_escPressed) Application.Exit();
-    
-                if (dx != 0 || dy != 0)
+
+                _isPlayerMoving = dx != 0 || dy != 0;
+                if (_isPlayerMoving)
                 {
                     _controller.MovePlayer(dx, dy);
                 }
@@ -116,10 +149,34 @@ namespace LabirintGame.View
                 }
             }
 
-            g.FillEllipse(Brushes.Black,
-                centerX - CellSize / 4,
-                centerY - CellSize / 4,
-                CellSize / 2, CellSize / 2);
+            // Обновляем анимацию если игрок двигается
+            if (_isPlayerMoving)
+            {
+                _animationTick++;
+                if (_animationTick >= FrameChangeRate)
+                {
+                    _animationTick = 0;
+                    _animationFrame = (_animationFrame + 1) % FramesPerDirection;
+                }
+            }
+            else
+            {
+                _animationFrame = 0; // замираем на первом кадре
+            }
+
+            Rectangle srcRect = new Rectangle(
+                _animationFrame * SpriteSize,
+                _playerDirection * SpriteSize,
+                SpriteSize, SpriteSize);
+
+            RectangleF destRect = new RectangleF(
+                centerX - CellSize / 4f,
+                centerY - CellSize / 4f,
+                CellSize / 2f,
+                CellSize / 2f);
+
+            g.DrawImage(_playerSpriteSheet, destRect, srcRect, GraphicsUnit.Pixel);
+
             
             foreach (var en in _controller.Enemies)
             {
