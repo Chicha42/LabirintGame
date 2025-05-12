@@ -12,7 +12,7 @@ namespace LabirintGame.Model
         
         private bool _isMoving;
         private float _moveProgress;
-        private const float MoveDuration = 0.3f;
+        private const float MoveDuration = 0.35f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
         
         public EnemyState CurrentState { get; set; }

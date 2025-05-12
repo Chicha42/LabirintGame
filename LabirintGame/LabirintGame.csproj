@@ -13,5 +13,10 @@
         <SubType>Form</SubType>
       </Compile>
     </ItemGroup>
-
+    
+    <ItemGroup>
+      <None Update="Assets\**\*">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@ namespace LabirintGame.Model
         public float DrawY { get; private set; }
         private bool _isMoving;
         private float _moveProgress;
-        private const float MoveDuration = 0.25f;
+        private const float MoveDuration = 0.3f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
         
 

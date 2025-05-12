@@ -14,7 +14,9 @@ namespace LabirintGame.View
         private const int CellSize = 200;
         private readonly Timer _timer = new Timer();
         private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
-
+        private Bitmap wall, floor, blueKey;
+        private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
+    
         public MainForm()
         {   
             InitializeComponent();
@@ -23,12 +25,15 @@ namespace LabirintGame.View
             WindowState = FormWindowState.Maximized;
             KeyPreview = true;
             Resize += (_, _) => Invalidate();
+            _tileTextures[TileType.Wall] = LoadTexture("Assets/wall.png");
+            _tileTextures[TileType.Floor] = LoadTexture("Assets/floor.png");
+            _tileTextures[TileType.KeyBlue] = LoadTexture("Assets/key.png");
 
             _controller = new GameController(this, 3);
 
             Paint += MainForm_Paint;
             
-            _timer.Interval = 16;
+            _timer.Interval = 10;
             _timer.Tick += (_, _) =>
             {
                 int dx = 0, dy = 0;
@@ -79,6 +84,8 @@ namespace LabirintGame.View
         {
             var maze = _controller.Maze;
             var g = e.Graphics;
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half; // Опционально: точность
             g.Clear(Color.DarkGray);
             
             var centerX = ClientSize.Width / 2;
@@ -92,28 +99,20 @@ namespace LabirintGame.View
                 {
                     var screenX = centerX - (x - _controller.CameraX) * CellSize;
                     var screenY = centerY - (y - _controller.CameraY) * CellSize;
-                    
-                    Brush brush = maze.Grid[y, x] switch
-                    {
-                        0 => Brushes.Black,
-                        1 => Brushes.White,
-                        3 => Brushes.Green,
-                        10 => Brushes.Red,
-                        9 => Brushes.Green,
-                        8 => Brushes.Blue,
-                        20 => Brushes.DarkRed,
-                        19 => Brushes.DarkGreen,
-                        18 => Brushes.DarkBlue,
-                        _ => Brushes.Gray
-                    };
 
-                    RectangleF rect = new RectangleF(
-                        screenX - CellSize / 2f, 
-                        screenY - CellSize / 2f, 
-                        CellSize, 
-                        CellSize);
-                    
-                    g.FillRectangle(brush, rect);
+                    if (x >= 0 && x < maze.Width && y >= 0 && y < maze.Height)
+                    {
+                        var tileCode = maze.Grid[y, x];
+                        var tileType = GetTileType(tileCode);
+
+                        if (!_tileTextures.TryGetValue(tileType, out var texture))
+                            texture = _tileTextures[TileType.Floor]; // fallback
+
+                        g.DrawImage(texture,
+                            screenX - CellSize / 2f,
+                            screenY - CellSize / 2f,
+                            CellSize, CellSize);
+                    }
                 }
             }
 
@@ -124,8 +123,8 @@ namespace LabirintGame.View
             
             foreach (var en in _controller.Enemies)
             {
-                float x = Width/2;
-                float y = Height/2;
+                float x = Width / 2;
+                float y = Height / 2;
                 float cell = CellSize; // ваша константа
                 float sx = x - (en.DrawX - _controller.CameraX)*cell;
                 float sy = y - (en.DrawY - _controller.CameraY)*cell;
@@ -149,8 +148,9 @@ namespace LabirintGame.View
 
         private (int startX, int startY, int endX, int endY) GetVisibleBounds(Maze maze)
         {
-            var visibleCellsX = (int)Math.Ceiling(ClientSize.Width*2 / (float)CellSize) + 2;
-            var visibleCellsY = (int)Math.Ceiling(ClientSize.Height *2/ (float)CellSize) + 2;
+            var visibleCellsX = (int)Math.Ceiling(ClientSize.Width / (float)CellSize) + 2;
+            var visibleCellsY = (int)Math.Ceiling(ClientSize.Height / (float)CellSize) + 2;
+
             
             var startX = (int)Math.Floor(_controller.CameraX - visibleCellsX / 2f);
             var startY = (int)Math.Floor(_controller.CameraY - visibleCellsY / 2f);
@@ -162,5 +162,42 @@ namespace LabirintGame.View
                 Math.Min(maze.Width - 1, endX),
                 Math.Min(maze.Height - 1, endY));
         }
+        
+        private TileType GetTileType(int code)
+        {
+            return code switch
+            {
+                0 => TileType.Wall,
+                1 => TileType.Floor,
+                3 => TileType.Player,
+                8 => TileType.KeyGreen,
+                9 => TileType.KeyRed,
+                10 => TileType.KeyBlue,
+                18 => TileType.DoorGreen,
+                19 => TileType.DoorRed,
+                20 => TileType.DoorBlue,
+                _ => TileType.Floor
+            };
+        }
+        
+        private Bitmap LoadTexture(string path)
+        {
+            var original = new Bitmap(path);
+
+            // Создаём пустой bitmap нужного размера
+            var resized = new Bitmap(original.Width, original.Height);
+
+            using (var g = Graphics.FromImage(resized))
+            {
+                // Выключаем сглаживание — сохраняем пиксель-арт
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                g.DrawImage(original, 0, 0, resized.Width, resized.Height);
+            }
+
+            return resized;
+        }
+
+
     }
 }

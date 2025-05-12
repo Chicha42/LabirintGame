@@ -57,3 +57,8 @@ D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\ref
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.pdb
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.genruntimeconfig.cache
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\obj\Debug\net8.0-windows\ref\LabirintGame.dll
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\door_closed.png
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\floor.png
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\key.png
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\PlayerAnim.png
+D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\wall.png
