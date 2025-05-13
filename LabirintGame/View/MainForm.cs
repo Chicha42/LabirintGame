@@ -118,7 +118,7 @@ namespace LabirintGame.View
             var maze = _controller.Maze;
             var g = e.Graphics;
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half; // Опционально: точность
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
             g.Clear(Color.DarkGray);
             
             var centerX = ClientSize.Width / 2;
@@ -139,7 +139,7 @@ namespace LabirintGame.View
                         var tileType = GetTileType(tileCode);
 
                         if (!_tileTextures.TryGetValue(tileType, out var texture))
-                            texture = _tileTextures[TileType.Floor]; // fallback
+                            texture = _tileTextures[TileType.Floor];
 
                         g.DrawImage(texture,
                             screenX - CellSize / 2f,
@@ -148,8 +148,7 @@ namespace LabirintGame.View
                     }
                 }
             }
-
-            // Обновляем анимацию если игрок двигается
+            
             if (_isPlayerMoving)
             {
                 _animationTick++;
@@ -161,7 +160,7 @@ namespace LabirintGame.View
             }
             else
             {
-                _animationFrame = 0; // замираем на первом кадре
+                _animationFrame = 0;
             }
 
             Rectangle srcRect = new Rectangle(
@@ -182,10 +181,10 @@ namespace LabirintGame.View
             {
                 float x = Width / 2;
                 float y = Height / 2;
-                float cell = CellSize; // ваша константа
-                float sx = x - (en.DrawX - _controller.CameraX)*cell;
-                float sy = y - (en.DrawY - _controller.CameraY)*cell;
-                float size = cell * 0.5f;
+                const float cell = CellSize;
+                var sx = x - (en.DrawX - _controller.CameraX)*cell;
+                var sy = y - (en.DrawY - _controller.CameraY)*cell;
+                var size = cell * 0.5f;
                 g.FillEllipse(Brushes.DarkRed,
                     sx - size/2, sy - size/2,
                     size, size);
@@ -220,7 +219,7 @@ namespace LabirintGame.View
                 Math.Min(maze.Height - 1, endY));
         }
         
-        private TileType GetTileType(int code)
+        private static TileType GetTileType(int code)
         {
             return code switch
             {
@@ -240,21 +239,15 @@ namespace LabirintGame.View
         private Bitmap LoadTexture(string path)
         {
             var original = new Bitmap(path);
-
-            // Создаём пустой bitmap нужного размера
+            
             var resized = new Bitmap(original.Width, original.Height);
 
-            using (var g = Graphics.FromImage(resized))
-            {
-                // Выключаем сглаживание — сохраняем пиксель-арт
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-                g.DrawImage(original, 0, 0, resized.Width, resized.Height);
-            }
+            using var g = Graphics.FromImage(resized);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            g.DrawImage(original, 0, 0, resized.Width, resized.Height);
 
             return resized;
         }
-
-
     }
 }
