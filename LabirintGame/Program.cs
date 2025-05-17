@@ -12,7 +12,7 @@ namespace LabirintGame
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new MainMenuForm());
+            Application.Run(new MainMenu());
         }
     }
 }

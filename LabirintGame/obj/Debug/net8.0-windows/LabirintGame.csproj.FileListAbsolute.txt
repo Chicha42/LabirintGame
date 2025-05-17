@@ -62,3 +62,13 @@ D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Ass
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\key.png
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\PlayerAnim.png
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\wall.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\door_closed.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\floor.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\PlayerAnim.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\wall.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\MainMenuBG.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\WallBg.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\BlueKey.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\GreenDoor.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\GreenKey.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\RedKey.png

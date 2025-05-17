@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace LabirintGame.View;
 
-partial class MainMenuForm
+partial class Training
 {
     /// <summary>
     /// Required designer variable.
@@ -10,7 +10,7 @@ partial class MainMenuForm
     private IContainer components = null;
 
     /// <summary>
-    /// Clean up any resources being used.фф
+    /// Clean up any resources being used.
     /// </summary>
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing)
@@ -34,7 +34,7 @@ partial class MainMenuForm
         this.components = new System.ComponentModel.Container();
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         this.ClientSize = new System.Drawing.Size(800, 450);
-        this.Text = "MainMenuForm";
+        this.Text = "Training";
     }
 
     #endregion

@@ -23,7 +23,7 @@ namespace LabirintGame.View
         private const int FramesPerDirection = 4;
         private int _animationFrame = 0;
         private int _animationTick = 0;
-        private const int FrameChangeRate = 6;
+        private const int FrameChangeRate = 10;
         private bool _isPlayerMoving = false;
         private int _playerDirection = 0;
 
@@ -38,7 +38,10 @@ namespace LabirintGame.View
             Resize += (_, _) => Invalidate();
             _tileTextures[TileType.Wall] = LoadTexture("Assets/wall.png");
             _tileTextures[TileType.Floor] = LoadTexture("Assets/floor.png");
-            _tileTextures[TileType.KeyBlue] = LoadTexture("Assets/key.png");
+            _tileTextures[TileType.KeyBlue] = LoadTexture("Assets/BlueKey.png");
+            _tileTextures[TileType.KeyGreen] = LoadTexture("Assets/GreenKey.png");
+            _tileTextures[TileType.KeyRed] = LoadTexture("Assets/RedKey.png");
+            _tileTextures[TileType.DoorGreen] = LoadTexture("Assets/GreenDoor.png");
             _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
 
 
@@ -75,7 +78,7 @@ namespace LabirintGame.View
                 }
                 if (_escPressed) Application.Exit();
 
-                _isPlayerMoving = dx != 0 || dy != 0;
+                _isPlayerMoving = (dx != 0 || dy != 0) && _controller.Maze.Grid[_controller.Player.Y+dy, _controller.Player.X+dx] != 0;
                 if (_isPlayerMoving)
                 {
                     _controller.MovePlayer(dx, dy);
@@ -126,9 +129,9 @@ namespace LabirintGame.View
             
             var (startX, startY, endX, endY) = GetVisibleBounds(maze);
             
-            for (int y = startY; y <= endY; y++)
+            for (var y = startY; y <= endY; y++)
             {
-                for (int x = startX; x <= endX; x++)
+                for (var x = startX; x <= endX; x++)
                 {
                     var screenX = centerX - (x - _controller.CameraX) * CellSize;
                     var screenY = centerY - (y - _controller.CameraY) * CellSize;
@@ -169,10 +172,10 @@ namespace LabirintGame.View
                 SpriteSize, SpriteSize);
 
             RectangleF destRect = new RectangleF(
-                centerX - CellSize / 4f,
-                centerY - CellSize / 4f,
-                CellSize / 2f,
-                CellSize / 2f);
+                centerX - CellSize / 3f,
+                centerY - CellSize / 3f,
+                CellSize / 1.5f,
+                CellSize / 1.5f);
 
             g.DrawImage(_playerSpriteSheet, destRect, srcRect, GraphicsUnit.Pixel);
 

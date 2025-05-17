@@ -1,11 +1,10 @@
 namespace LabirintGame.View;
 
-public partial class MainMenuForm : Form
+public partial class MainMenu : Form
 {
     private Button[] buttons;
-    public MainMenuForm()
+    public MainMenu()
     {
-        InitializeComponent();
         InitializeComponent();
         DoubleBuffered = true;
         FormBorderStyle = FormBorderStyle.None;
@@ -18,7 +17,8 @@ public partial class MainMenuForm : Form
             CreateButton("Начать игру", 30, startButton_Click),
             CreateButton("Выход", 250, exitButton_Click)
         };
-        BackColor = Color.FromArgb(255, 38,38,38);
+        
+        BackgroundImage = LoadTexture("Assets/WallBg.png");
         
         foreach (var btn in buttons)
             Controls.Add(btn);
@@ -65,5 +65,19 @@ public partial class MainMenuForm : Form
     private void exitButton_Click(object sender, EventArgs e)
     {
         Application.Exit();
+    }
+    
+    public Bitmap LoadTexture(string path)
+    {
+        var original = new Bitmap(path);
+            
+        var resized = new Bitmap(128, 128);
+
+        using var g = Graphics.FromImage(resized);
+        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+        g.DrawImage(original, 0, 0, resized.Width, resized.Height);
+
+        return resized;
     }
 }
