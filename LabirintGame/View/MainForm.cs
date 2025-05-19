@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using LabirintGame.Model;
 using LabirintGame.Controller;
@@ -42,6 +43,8 @@ namespace LabirintGame.View
             _tileTextures[TileType.KeyGreen] = LoadTexture("Assets/GreenKey.png");
             _tileTextures[TileType.KeyRed] = LoadTexture("Assets/RedKey.png");
             _tileTextures[TileType.DoorGreen] = LoadTexture("Assets/GreenDoor.png");
+            _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
+            _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
             _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
 
 
@@ -120,9 +123,10 @@ namespace LabirintGame.View
         {
             var maze = _controller.Maze;
             var g = e.Graphics;
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-            g.Clear(Color.DarkGray);
+            g.InterpolationMode = InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = PixelOffsetMode.Half;
+            var sideBrush = new SolidBrush(Color.FromArgb(25, 25, 25));
+            g.Clear(sideBrush.Color);
             
             var centerX = ClientSize.Width / 2;
             var centerY = ClientSize.Height / 2;
@@ -166,12 +170,12 @@ namespace LabirintGame.View
                 _animationFrame = 0;
             }
 
-            Rectangle srcRect = new Rectangle(
+            var srcRect = new Rectangle(
                 _animationFrame * SpriteSize,
                 _playerDirection * SpriteSize,
                 SpriteSize, SpriteSize);
 
-            RectangleF destRect = new RectangleF(
+            var destRect = new RectangleF(
                 centerX - CellSize / 3f,
                 centerY - CellSize / 3f,
                 CellSize / 1.5f,
@@ -193,16 +197,43 @@ namespace LabirintGame.View
                     size, size);
             }
             
-            g.FillRectangle(Brushes.DarkGray,
+            
+            
+            g.FillRectangle(sideBrush,
                 0f,
                 0f,
                 CellSize*2.3f,
                 (float)ClientSize.Height);
-            g.FillRectangle(Brushes.DarkGray,
+            g.FillRectangle(sideBrush,
                 ClientSize.Width-(CellSize*2.3f),
                 0f,
                 CellSize*2.3f,
                 (float)ClientSize.Height);
+            
+            // Размеры полоски
+            int barWidth = 400;
+            int barHeight = 45;
+            int margin = 30;
+
+            // Позиция полоски
+            int HealthBarX = 0 + margin;
+            int HealthBarY = margin*3;
+
+            // Пропорция здоровья (от 0 до 1)
+            float healthRatio = Math.Clamp(_controller.Player.Health / 100f, 0f, 1f);
+
+            // Фон полоски (серый)
+            g.FillRectangle(Brushes.Gray, HealthBarX, HealthBarY, barWidth, barHeight);
+
+            // Заполненная часть (бордовая)
+            using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0))) // Dark red
+            {
+                g.FillRectangle(healthBrush, HealthBarX, HealthBarY, barWidth * healthRatio, barHeight);
+            }
+
+            // Рамка (по желанию)
+            g.DrawRectangle(Pens.Black, HealthBarX, HealthBarY, barWidth, barHeight);
+
         }
 
         private (int startX, int startY, int endX, int endY) GetVisibleBounds(Maze maze)

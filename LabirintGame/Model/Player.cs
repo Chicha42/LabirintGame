@@ -29,8 +29,8 @@ namespace LabirintGame.Model
         {
             if (_isMoving) return;
             
-            bool canMoveX = CanMoveTo(X + deltaX, Y);
-            bool canMoveY = CanMoveTo(X, Y + deltaY);
+            var canMoveX = CanMoveTo(X + deltaX, Y);
+            var canMoveY = CanMoveTo(X, Y + deltaY);
             
             if (deltaX != 0 && deltaY != 0)
             {
@@ -41,8 +41,8 @@ namespace LabirintGame.Model
 
             if (deltaX != 0 || deltaY != 0)
             {
-                int newX = X + deltaX;
-                int newY = Y + deltaY;
+                var newX = X + deltaX;
+                var newY = Y + deltaY;
 
                 if(!InBounds(newX,newY)) return;
                 

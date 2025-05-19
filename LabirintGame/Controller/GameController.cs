@@ -36,7 +36,7 @@ namespace LabirintGame.Controller
             var rnd = _model.Maze.Random;
             var empty = _model.Maze.GetEmptyCells();
             
-            for (int i = 0; i < enemyCount; i++)
+            for (var i = 0; i < enemyCount; i++)
             {
                 var (x, y) = empty[rnd.Next(empty.Count)];
                 _model.Enemies.Add(new Enemy(_model.Maze, health:50, damage:10, x, y));
@@ -65,13 +65,13 @@ namespace LabirintGame.Controller
         {
             if (_isGameOver) return;
             var now = DateTime.Now;
-            float dt = (float)(now - _lastUpdateTime).TotalSeconds;
+            var dt = (float)(now - _lastUpdateTime).TotalSeconds;
             _lastUpdateTime = now;
 
             _model.Player.Update(dt);
             UpdateEnemies(dt);
             UpdateCamera(dt);
-
+            
             _view.Invalidate();
         }
 
@@ -100,17 +100,24 @@ namespace LabirintGame.Controller
                     if (enemy.CurrentState == EnemyState.Chasing)
                     {
                         var path = FindPath(enemy.X, enemy.Y, Player.X, Player.Y);
-                        if (path.Count > 1)
+                        if (path.Count > 2)
                             move = (path[1].x - enemy.X, path[1].y - enemy.Y);
                     }
                     else
                     {
-                        var rnd = new Random();
-                        var dirs = new[] { (1, 0), (-1, 0), (0, 1), (0, -1) }
-                            .OrderBy(_ => rnd.Next()).ToArray();
-                        foreach (var (dx0,dy0) in dirs)
-                            if (_model.Maze.Grid[enemy.Y+dy0,enemy.X+dx0] > 0)
-                            { move = (dx0,dy0); break; }
+                        if (enemy.wanderTimer >= enemy.WanderCooldown)
+                        {
+                            var rnd = new Random();
+                            var dirs = new[] { (1, 0), (-1, 0), (0, 1), (0, -1) }
+                                .OrderBy(_ => rnd.Next()).ToArray();
+                            foreach (var (dx0,dy0) in dirs)
+                                if (_model.Maze.Grid[enemy.Y + dy0, enemy.X + dx0] > 0)
+                                {
+                                    move = (dx0,dy0);
+                                    enemy.wanderTimer = 0f;
+                                    break;
+                                }
+                        }
                     }
 
                     if (move != (0,0)) enemy.Move(move.dx, move.dy);
@@ -175,7 +182,7 @@ namespace LabirintGame.Controller
             visited[sy, sx] = true;
 
             var dirs = new (int dx, int dy)[] { (1,0), (-1,0), (0,1), (0,-1) };
-            bool found = false;
+            var found = false;
             while (q.Count > 0)
             {
                 var (x, y) = q.Dequeue();

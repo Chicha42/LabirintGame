@@ -72,3 +72,29 @@ C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\GreenDoor.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\GreenKey.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\RedKey.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\BlueKey.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\floor.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\GreenDoor.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\GreenKey.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\PlayerAnim.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\RedKey.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\wall.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\WallBg.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.exe
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.deps.json
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.runtimeconfig.json
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.dll
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.pdb
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.AssemblyInfoInputs.cache
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.AssemblyInfo.cs
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.csproj.CoreCompileInputs.cache
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.sourcelink.json
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.dll
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\refint\LabirintGame.dll
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.pdb
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\LabirintGame.genruntimeconfig.cache
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\ref\LabirintGame.dll
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\BlueDoor.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\RedDoor.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\Fog.png

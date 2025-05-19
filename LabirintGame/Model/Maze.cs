@@ -65,9 +65,9 @@ namespace LabirintGame.Model
         {
             var emptyCells = new List<(int x, int y)>();
 
-            for (int y = 5; y < Height - 5; y++)
+            for (var y = 5; y < Height - 5; y++)
             {
-                for (int x = 5; x < Width - 5; x++)
+                for (var x = 5; x < Width - 5; x++)
                 {
                     if (Grid[y, x] == 1)
                         emptyCells.Add((x, y));
@@ -125,13 +125,13 @@ namespace LabirintGame.Model
 
         private int CountWallsAround(int x, int y)
         {
-            int count = 0;
+            var count = 0;
             var dirs = new (int dx, int dy)[] { (0, -1), (0, 1), (-1, 0), (1, 0) };
 
             foreach (var (dx, dy) in dirs)
             {
-                int nx = x + dx;
-                int ny = y + dy;
+                var nx = x + dx;
+                var ny = y + dy;
                 if (!InBounds(nx, ny) || Grid[ny, nx] == 0)
                     count++;
             }
@@ -149,8 +149,8 @@ namespace LabirintGame.Model
 
             foreach (var (dx, dy) in dirs)
             {
-                int nx = x + dx;
-                int ny = y + dy;
+                var nx = x + dx;
+                var ny = y + dy;
 
                 if (InBounds(nx, ny) && !visited[ny, nx])
                 {
@@ -162,12 +162,12 @@ namespace LabirintGame.Model
         
         private int GetDistanceBfs(int startX, int startY, int targetX, int targetY)
         {
-            int[,] distances = new int[Height, Width];
-            bool[,] visited = new bool[Height, Width];
+            var distances = new int[Height, Width];
+            var visited = new bool[Height, Width];
             Queue<(int x, int y)> queue = new Queue<(int, int)>();
 
-            for (int y = 0; y < Height; y++)
-                for (int x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
+                for (var x = 0; x < Width; x++)
                     distances[y, x] = -1;
 
             queue.Enqueue((startX, startY));
@@ -181,8 +181,8 @@ namespace LabirintGame.Model
 
                 foreach (var (dx, dy) in dirs)
                 {
-                    int nx = x + dx;
-                    int ny = y + dy;
+                    var nx = x + dx;
+                    var ny = y + dy;
 
                     if (InBounds(nx, ny) && !visited[ny, nx] && Grid[ny, nx] != 0)
                     {
@@ -198,7 +198,7 @@ namespace LabirintGame.Model
 
         private void AddBranches(List<(int x, int y)> mainPath, int count)
         {
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 var (x, y) = mainPath[_random.Next(5, mainPath.Count - 5)];
 
@@ -207,8 +207,8 @@ namespace LabirintGame.Model
 
                 foreach (var (dx, dy) in dirs)
                 {
-                    int nx = x + dx;
-                    int ny = y + dy;
+                    var nx = x + dx;
+                    var ny = y + dy;
                     if (InBounds(nx, ny) && Grid[ny, nx] == 0)
                     {
                         Grid[y + dy / 2, x + dx / 2] = 1;
@@ -222,14 +222,14 @@ namespace LabirintGame.Model
         private bool InBounds(int x, int y)
             => x > 0 && y > 0 && x < Width - 1 && y < Height - 1;
         
-        public readonly Random Random = new Random();
+        public readonly Random Random = new();
 
         public List<(int x, int y)> GetEmptyCells()
         {
             var cells = new List<(int x, int y)>();
-            for (int y = 0; y < Height; y++)
+            for (var y = 0; y < Height; y++)
             {
-                for (int x = 0; x < Width; x++)
+                for (var x = 0; x < Width; x++)
                 {
                     if (Grid[y, x] == 1 && !(x == 1 && y == 0))
                         cells.Add((x, y));

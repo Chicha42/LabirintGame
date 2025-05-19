@@ -14,6 +14,9 @@ namespace LabirintGame.Model
         private float _moveProgress;
         private const float MoveDuration = 0.35f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
+        public float WanderCooldown = 0.3f; // 300 мс
+        public float wanderTimer = 0f;
+
         
         public EnemyState CurrentState { get; set; }
         public bool CanDealDamage { get; set; } = true;
@@ -51,7 +54,7 @@ namespace LabirintGame.Model
         
         public void Update(float deltaTime)
         {
-            if (!_isMoving) return;
+            if (!_isMoving) wanderTimer += deltaTime;
             
             _moveProgress += deltaTime / MoveDuration;
             

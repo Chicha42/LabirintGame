@@ -51,12 +51,12 @@ public partial class MainMenu : Form
     }
     private void CenterButtons()
     {
-        int spacing = 15;
-        int buttonHeight = buttons[0].Height;
-        int totalHeight = buttons.Length * buttonHeight + (buttons.Length - 1) * spacing;
-        int startY = (ClientSize.Height - totalHeight) / 2;
+        var spacing = 15;
+        var buttonHeight = buttons[0].Height;
+        var totalHeight = buttons.Length * buttonHeight + (buttons.Length - 1) * spacing;
+        var startY = (ClientSize.Height - totalHeight) / 2;
 
-        for (int i = 0; i < buttons.Length; i++)
+        for (var i = 0; i < buttons.Length; i++)
         {
             buttons[i].Top = startY + i * (buttonHeight + spacing);
             buttons[i].Left = (ClientSize.Width - buttons[i].Width) / 2;
