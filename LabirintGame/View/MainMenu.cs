@@ -10,39 +10,58 @@ public partial class MainMenu : Form
         FormBorderStyle = FormBorderStyle.None;
         WindowState = FormWindowState.Maximized;
         KeyPreview = true;
-        Resize += (s, e) => CenterButtons();
+        Resize += (s, e) => Invalidate();
 
-        buttons = new Button[]
-        {
-            CreateButton("Начать игру", 30, startButton_Click),
-            CreateButton("Выход", 250, exitButton_Click)
-        };
+        buttons =
+        [
+            CreateButton( 384, trainingButton_click),
+            CreateButton(603, startButton_Click),
+            CreateButton(822, exitButton_Click)
+        ];
         
-        BackgroundImage = LoadTexture("Assets/WallBg.png");
         
         foreach (var btn in buttons)
             Controls.Add(btn);
+
+        Paint += MainMenu_Paint;
+        BackgroundImage = LoadTexture("Assets/floor.png");
     }
-    
-    private Button CreateButton(string text, int top, EventHandler onClick)
+
+    private void trainingButton_click(object? sender, EventArgs e)
+    {
+        var trainingForm = new Training();
+        trainingForm.Show();
+        this.Hide();
+    }
+
+    private Button CreateButton(int top, EventHandler onClick)
     {
         var button = new Button
         {
-            Text = text,
-            ForeColor = Color.White,
-            Font = new Font("impact", 42, FontStyle.Bold),
-            Width = 600,
-            Height = 200,
+            BackColor = Color.Transparent,
+            FlatStyle = FlatStyle.Flat,
+            Width = 660,
+            Height = 170,
             Top = top,
-            Anchor = AnchorStyles.Top | AnchorStyles.Left
+            Anchor = AnchorStyles.Top | AnchorStyles.Left,
+            TabStop = false,
         };
+        
+        button.FlatAppearance.BorderSize = 0;
+        button.FlatAppearance.MouseDownBackColor = Color.Transparent;
+        button.FlatAppearance.MouseOverBackColor = Color.Transparent;
+        button.FlatAppearance.CheckedBackColor = Color.Transparent;
+    
         button.Click += onClick;
+
         button.Location = new Point(
-            (ClientSize.Width - button.Width) / 2,
+            630,
             top
         );
+
         return button;
     }
+
     private void startButton_Click(object sender, EventArgs e)
     {
         var gameForm = new MainForm();
@@ -66,7 +85,6 @@ public partial class MainMenu : Form
     {
         Application.Exit();
     }
-    
     public Bitmap LoadTexture(string path)
     {
         var original = new Bitmap(path);
@@ -80,4 +98,16 @@ public partial class MainMenu : Form
 
         return resized;
     }
+    public void MainMenu_Paint(object sender, PaintEventArgs e)
+    {
+        var g = e.Graphics;
+    
+        // Фон
+
+    
+        // Текст поверх кнопок
+        using var textImage = new Bitmap("Assets/MainMenu.png");
+        g.DrawImage(textImage, 0, 0, ClientSize.Width, ClientSize.Height);
+    }
+
 }

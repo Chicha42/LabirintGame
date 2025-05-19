@@ -1,6 +1,14 @@
 namespace LabirintGame.Model
 {
     public enum EnemyState { Wandering, Chasing }
+    
+    public enum Direction
+    {
+        Up = 0,
+        Down = 1,
+        Right = 2,
+        Left = 3
+    }
     public class Enemy : Pos
     {
         private readonly Maze _maze;
@@ -14,12 +22,13 @@ namespace LabirintGame.Model
         private float _moveProgress;
         private const float MoveDuration = 0.35f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
-        public float WanderCooldown = 0.3f; // 300 мс
+        public float WanderCooldown = 0.15f;
         public float wanderTimer = 0f;
-
-        
         public EnemyState CurrentState { get; set; }
         public bool CanDealDamage { get; set; } = true;
+        public Direction Direction { get; set; }
+        
+        
         public Enemy(Maze maze, int health, int damage, int x, int y) : base(x, y)
         {
             _maze = maze;

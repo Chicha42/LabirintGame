@@ -22,11 +22,20 @@ namespace LabirintGame.View
         private Bitmap _playerSpriteSheet;
         private const int SpriteSize = 32;
         private const int FramesPerDirection = 4;
-        private int _animationFrame = 0;
-        private int _animationTick = 0;
+        private int _animationFrame;
+        private int _animationTick;
         private const int FrameChangeRate = 10;
         private bool _isPlayerMoving = false;
-        private int _playerDirection = 0;
+        private int _playerDirection;
+        
+        //Анимация врага
+        private Bitmap _enemySpriteSheet;
+        private const int EnemySpriteSize = 64;
+        private const int EnemyFramesPerDirection = 6;
+        private int _enemyAnimationFrame;
+        private int _enemyAnimationTick;
+        private const int EnemyFrameChangeRate = 10;
+
 
     
         public MainForm()
@@ -46,6 +55,8 @@ namespace LabirintGame.View
             _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
             _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
             _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
+            _enemySpriteSheet = new Bitmap("Assets/orc1_walk_full.png");
+
 
 
             _controller = new GameController(this, 3);
@@ -183,19 +194,39 @@ namespace LabirintGame.View
 
             g.DrawImage(_playerSpriteSheet, destRect, srcRect, GraphicsUnit.Pixel);
 
+            _enemyAnimationTick++;
+            if (_enemyAnimationTick >= EnemyFrameChangeRate)
+            {
+                _enemyAnimationTick = 0;
+                _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
+            }
+
             
             foreach (var en in _controller.Enemies)
             {
                 float x = Width / 2;
                 float y = Height / 2;
                 const float cell = CellSize;
-                var sx = x - (en.DrawX - _controller.CameraX)*cell;
-                var sy = y - (en.DrawY - _controller.CameraY)*cell;
-                var size = cell * 0.5f;
-                g.FillEllipse(Brushes.DarkRed,
-                    sx - size/2, sy - size/2,
+                var sx = x - (en.DrawX - _controller.CameraX) * cell;
+                var sy = y - (en.DrawY - _controller.CameraY) * cell;
+                var size = cell;
+
+                // Пока враги всегда смотрят вниз (на строку 0)
+                int enemyDirection = (int)en.Direction;
+
+                var srcRectE = new Rectangle(
+                    _enemyAnimationFrame * EnemySpriteSize,
+                    enemyDirection * EnemySpriteSize,
+                    EnemySpriteSize, EnemySpriteSize);
+
+                var destRectE = new RectangleF(
+                    sx - size / 2,
+                    sy - size / 2,
                     size, size);
+
+                g.DrawImage(_enemySpriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
             }
+
             
             
             

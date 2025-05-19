@@ -13,8 +13,9 @@ namespace LabirintGame.Model
         private float _moveProgress;
         private const float MoveDuration = 0.3f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
+        private float TimeStationary { get; set; }
+        private float RegenTimer { get; set; }
         
-
         public Player(Maze maze, int startX, int startY, List<Key> collectedKeys) : base(startX, startY)
         {
             CollectedKeys = collectedKeys;
@@ -95,8 +96,33 @@ namespace LabirintGame.Model
 
         public void Update(float deltaTime)
         {
-            if (!_isMoving) return;
+            if (!_isMoving)
+            {
+                TimeStationary += deltaTime;
+
+                if (TimeStationary > 1.5f)
+                {
+                    RegenTimer += deltaTime;
+
+                    if (RegenTimer >= 0.5f)
+                    {
+                        if (Health < 100)
+                            Health = Math.Min(100, Health + 5);
             
+                        RegenTimer = 0f;
+                    }
+                }
+                else
+                {
+                    RegenTimer = 0f;
+                }
+                return;
+            }
+
+            TimeStationary = 0f;
+            RegenTimer = 0f;
+
+
             _moveProgress += deltaTime / MoveDuration;
             
             if (_moveProgress >= 1f)
@@ -110,7 +136,7 @@ namespace LabirintGame.Model
             DrawX = Lerp(_moveData.fromX, _moveData.toX, _moveProgress);
             DrawY = Lerp(_moveData.fromY, _moveData.toY, _moveProgress);
         }
-        
+
         private float Lerp(float a, float b, float t)
         {
             return a + (b - a) * t;

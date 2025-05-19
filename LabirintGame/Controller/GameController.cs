@@ -39,7 +39,7 @@ namespace LabirintGame.Controller
             for (var i = 0; i < enemyCount; i++)
             {
                 var (x, y) = empty[rnd.Next(empty.Count)];
-                _model.Enemies.Add(new Enemy(_model.Maze, health:50, damage:10, x, y));
+                _model.Enemies.Add(new Enemy(_model.Maze, health:50, damage:5, x, y));
             }
         }
 
@@ -100,8 +100,12 @@ namespace LabirintGame.Controller
                     if (enemy.CurrentState == EnemyState.Chasing)
                     {
                         var path = FindPath(enemy.X, enemy.Y, Player.X, Player.Y);
+
                         if (path.Count > 2)
+                        {
                             move = (path[1].x - enemy.X, path[1].y - enemy.Y);
+                            UpdateDirection(enemy, move.dx, move.dy);
+                        }
                     }
                     else
                     {
@@ -113,6 +117,7 @@ namespace LabirintGame.Controller
                             foreach (var (dx0,dy0) in dirs)
                                 if (_model.Maze.Grid[enemy.Y + dy0, enemy.X + dx0] > 0)
                                 {
+                                    UpdateDirection(enemy, dx0, dy0);
                                     move = (dx0,dy0);
                                     enemy.wanderTimer = 0f;
                                     break;
@@ -123,32 +128,32 @@ namespace LabirintGame.Controller
                     if (move != (0,0)) enemy.Move(move.dx, move.dy);
                 }
 
-                if (enemy.X == Player.X && enemy.Y == Player.Y)
+                bool isClose = Math.Abs(enemy.X - Player.X) + Math.Abs(enemy.Y - Player.Y) <= 1;
+
+                if (isClose && enemy.CanDealDamage)
                 {
+                    Player.Health -= enemy.Damage;
+                    enemy.CanDealDamage = false;
+
                     var cooldownTimer = new Timer();
                     cooldownTimer.Interval = 500;
-                    if (enemy.X == Player.X && enemy.Y == Player.Y && enemy.CanDealDamage)
+
+                    cooldownTimer.Tick += (s, args) =>
                     {
-                        Player.Health -= enemy.Damage;
+                        enemy.CanDealDamage = true;
+                        cooldownTimer.Stop();
+                        cooldownTimer.Dispose();
+                    };
+                    cooldownTimer.Start();
 
-                        enemy.CanDealDamage = false;
-
-                        cooldownTimer.Tick += (s, args) =>
-                        {
-                            enemy.CanDealDamage = true;
-                            cooldownTimer.Stop();
-                            cooldownTimer.Dispose();
-                        };
-                        cooldownTimer.Start();
-
-                        if (Player.Health <= 0)
-                        {
-                            _isGameOver = true;
-                            MessageBox.Show("Game Over!");
-                            _view.BeginInvoke((Action)(() => Application.Exit()));
-                        }
+                    if (Player.Health <= 0)
+                    {
+                        _isGameOver = true;
+                        MessageBox.Show("Game Over!");
+                        _view.BeginInvoke((Action)(() => Application.Exit()));
                     }
                 }
+
             }
         }
         
@@ -217,5 +222,14 @@ namespace LabirintGame.Controller
         {
             return a + (b - a) * Math.Clamp(t, 0, 1);
         }
+        
+        private void UpdateDirection(Enemy enemy, int dx, int dy)
+        {
+            if (dx == 1) enemy.Direction = Direction.Right;
+            else if (dx == -1) enemy.Direction = Direction.Left;
+            else if (dy == 1) enemy.Direction = Direction.Down;
+            else if (dy == -1) enemy.Direction = Direction.Up;
+        }
+
     }
 }
