@@ -1,10 +1,6 @@
-using System;
-using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Windows.Forms;
 using LabirintGame.Model;
 using LabirintGame.Controller;
-using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
 
 namespace LabirintGame.View
@@ -102,7 +98,6 @@ namespace LabirintGame.View
                 Invalidate();
             };  
             _timer.Start();
-
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -142,8 +137,21 @@ namespace LabirintGame.View
             var centerX = ClientSize.Width / 2;
             var centerY = ClientSize.Height / 2;
             
-            var (startX, startY, endX, endY) = GetVisibleBounds(maze);
+            MazePaint(maze, centerX, centerY, g);
+
+            PlayerPaint(centerX, centerY, g);
+
+            EnemyPaint(g);
             
+            BordersPaint(g, sideBrush);
+
+            HealthBarPaint(g);
+        }
+
+        private void MazePaint(Maze maze, int centerX, int centerY, Graphics g)
+        {
+            var (startX, startY, endX, endY) = GetVisibleBounds(maze);
+
             for (var y = startY; y <= endY; y++)
             {
                 for (var x = startX; x <= endX; x++)
@@ -166,7 +174,10 @@ namespace LabirintGame.View
                     }
                 }
             }
-            
+        }
+
+        private void PlayerPaint(int centerX, int centerY, Graphics g)
+        {
             if (_isPlayerMoving)
             {
                 _animationTick++;
@@ -193,43 +204,10 @@ namespace LabirintGame.View
                 CellSize / 1.5f);
 
             g.DrawImage(_playerSpriteSheet, destRect, srcRect, GraphicsUnit.Pixel);
+        }
 
-            _enemyAnimationTick++;
-            if (_enemyAnimationTick >= EnemyFrameChangeRate)
-            {
-                _enemyAnimationTick = 0;
-                _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
-            }
-
-            
-            foreach (var en in _controller.Enemies)
-            {
-                float x = Width / 2;
-                float y = Height / 2;
-                const float cell = CellSize;
-                var sx = x - (en.DrawX - _controller.CameraX) * cell;
-                var sy = y - (en.DrawY - _controller.CameraY) * cell;
-                var size = cell;
-
-                // Пока враги всегда смотрят вниз (на строку 0)
-                int enemyDirection = (int)en.Direction;
-
-                var srcRectE = new Rectangle(
-                    _enemyAnimationFrame * EnemySpriteSize,
-                    enemyDirection * EnemySpriteSize,
-                    EnemySpriteSize, EnemySpriteSize);
-
-                var destRectE = new RectangleF(
-                    sx - size / 2,
-                    sy - size / 2,
-                    size, size);
-
-                g.DrawImage(_enemySpriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
-            }
-
-            
-            
-            
+        private void BordersPaint(Graphics g, SolidBrush sideBrush)
+        {
             g.FillRectangle(sideBrush,
                 0f,
                 0f,
@@ -240,31 +218,70 @@ namespace LabirintGame.View
                 0f,
                 CellSize*2.3f,
                 (float)ClientSize.Height);
+        }
+
+        private void EnemyPaint(Graphics g)
+        {
             
-            // Размеры полоски
-            int barWidth = 400;
-            int barHeight = 45;
-            int margin = 30;
+            _enemyAnimationTick++;
+            foreach (var en in _controller.Enemies)
+            {
+                var enemyDirection = (int)en.Direction;
+                float x = Width / 2;
+                float y = Height / 2;
+                var sx = x - (en.DrawX - _controller.CameraX) * CellSize;
+                var sy = y - (en.DrawY - _controller.CameraY) * CellSize;
+                
+                if (Math.Abs(en.X - _controller.Player.X) + Math.Abs(en.Y - _controller.Player.Y) <= 1)
+                {
+                    if (enemyDirection <= 1)
+                        _enemyAnimationFrame = 1;
+                    else
+                        _enemyAnimationFrame = 2;
+                }
+                else
+                {
+                    
+                    if (_enemyAnimationTick >= EnemyFrameChangeRate)
+                    {
+                        _enemyAnimationTick = 0;
+                        _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
+                    }
+                }
+                
+                var srcRectE = new Rectangle(
+                    _enemyAnimationFrame * EnemySpriteSize,
+                    enemyDirection * EnemySpriteSize,
+                    EnemySpriteSize, EnemySpriteSize);
 
-            // Позиция полоски
-            int HealthBarX = 0 + margin;
-            int HealthBarY = margin*3;
+                var destRectE = new RectangleF(
+                    sx - CellSize * 0.75f,
+                    sy - CellSize * 0.75f,
+                    CellSize*1.5f, CellSize*1.5f);
 
-            // Пропорция здоровья (от 0 до 1)
-            float healthRatio = Math.Clamp(_controller.Player.Health / 100f, 0f, 1f);
+                g.DrawImage(_enemySpriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
+            }
+        }
 
-            // Фон полоски (серый)
+        private void HealthBarPaint(Graphics g)
+        {
+            var barWidth = 400;
+            var barHeight = 45;
+            var margin = 30;
+            
+            var HealthBarX = 0 + margin;
+            var HealthBarY = margin*3;
+
+            var healthRatio = Math.Clamp(_controller.Player.Health / 100f, 0f, 1f);
+
             g.FillRectangle(Brushes.Gray, HealthBarX, HealthBarY, barWidth, barHeight);
 
-            // Заполненная часть (бордовая)
             using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0))) // Dark red
             {
                 g.FillRectangle(healthBrush, HealthBarX, HealthBarY, barWidth * healthRatio, barHeight);
             }
 
-            // Рамка (по желанию)
             g.DrawRectangle(Pens.Black, HealthBarX, HealthBarY, barWidth, barHeight);
-
         }
 
         private (int startX, int startY, int endX, int endY) GetVisibleBounds(Maze maze)

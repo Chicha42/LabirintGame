@@ -22,12 +22,9 @@ namespace LabirintGame.Model
         private float _moveProgress;
         private const float MoveDuration = 0.35f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
-        public float WanderCooldown = 0.15f;
-        public float wanderTimer = 0f;
         public EnemyState CurrentState { get; set; }
         public bool CanDealDamage { get; set; } = true;
         public Direction Direction { get; set; }
-        
         
         public Enemy(Maze maze, int health, int damage, int x, int y) : base(x, y)
         {
@@ -63,7 +60,7 @@ namespace LabirintGame.Model
         
         public void Update(float deltaTime)
         {
-            if (!_isMoving) wanderTimer += deltaTime;
+            if (!_isMoving) return;
             
             _moveProgress += deltaTime / MoveDuration;
             

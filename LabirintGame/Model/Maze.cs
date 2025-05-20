@@ -37,6 +37,11 @@ namespace LabirintGame.Model
             }
             GenerateMazeWithKeysAndDoors();
         }
+        
+        public Maze(int[,] customGrid)
+        {
+            Grid = customGrid;
+        }
 
         private void GenerateMazeWithKeysAndDoors()
         {

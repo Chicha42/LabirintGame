@@ -9,7 +9,8 @@ namespace LabirintGame.Controller
     public class GameController
     {
         private readonly GameModel _model;
-        private readonly MainForm _view;
+        private readonly MainForm _viewMain;
+        private readonly Training _viewTraining;
         private DateTime _lastUpdateTime;
         public float CameraX { get; private set; }
         public float CameraY { get; private set; }
@@ -21,7 +22,19 @@ namespace LabirintGame.Controller
 
         public GameController(MainForm view, int enemyCount)
         {
-            _view = view;
+            _viewMain = view;
+            _model = new GameModel(21, 21, 4);
+            _lastUpdateTime = DateTime.Now;
+            
+            CameraX = _model.Player.DrawX;
+            CameraY = _model.Player.DrawY;
+
+            SpawnEnemies(enemyCount);
+        }
+
+        public GameController(Training view, int enemyCount)
+        {
+            _viewTraining = view;
             _model = new GameModel(21, 21, 4);
             _lastUpdateTime = DateTime.Now;
             
@@ -55,10 +68,10 @@ namespace LabirintGame.Controller
             {
                 _isGameOver = true;
                 MessageBox.Show("Вы победили!");
-                _view.BeginInvoke(new Action(() => Application.Exit()));
+                _viewMain.BeginInvoke(new Action(() => Application.Exit()));
             }
 
-            _view.Invalidate();
+            _viewMain.Invalidate();
         }
 
         public void Update()
@@ -72,7 +85,7 @@ namespace LabirintGame.Controller
             UpdateEnemies(dt);
             UpdateCamera(dt);
             
-            _view.Invalidate();
+            _viewMain.Invalidate();
         }
 
         private void UpdateCamera(float dt)
@@ -109,8 +122,6 @@ namespace LabirintGame.Controller
                     }
                     else
                     {
-                        if (enemy.wanderTimer >= enemy.WanderCooldown)
-                        {
                             var rnd = new Random();
                             var dirs = new[] { (1, 0), (-1, 0), (0, 1), (0, -1) }
                                 .OrderBy(_ => rnd.Next()).ToArray();
@@ -119,16 +130,14 @@ namespace LabirintGame.Controller
                                 {
                                     UpdateDirection(enemy, dx0, dy0);
                                     move = (dx0,dy0);
-                                    enemy.wanderTimer = 0f;
                                     break;
                                 }
-                        }
                     }
 
                     if (move != (0,0)) enemy.Move(move.dx, move.dy);
                 }
 
-                bool isClose = Math.Abs(enemy.X - Player.X) + Math.Abs(enemy.Y - Player.Y) <= 1;
+                var isClose = Math.Abs(enemy.X - Player.X) + Math.Abs(enemy.Y - Player.Y) <= 1;
 
                 if (isClose && enemy.CanDealDamage)
                 {
@@ -150,7 +159,7 @@ namespace LabirintGame.Controller
                     {
                         _isGameOver = true;
                         MessageBox.Show("Game Over!");
-                        _view.BeginInvoke((Action)(() => Application.Exit()));
+                        _viewMain.BeginInvoke((Action)(() => Application.Exit()));
                     }
                 }
 

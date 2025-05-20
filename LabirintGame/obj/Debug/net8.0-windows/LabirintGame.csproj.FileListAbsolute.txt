@@ -79,7 +79,6 @@ D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-win
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\PlayerAnim.png
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\RedKey.png
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\wall.png
-D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\WallBg.png
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.exe
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.deps.json
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\LabirintGame.runtimeconfig.json
@@ -97,6 +96,5 @@ D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-win
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Debug\net8.0-windows\ref\LabirintGame.dll
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\BlueDoor.png
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\RedDoor.png
-D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\Fog.png
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\orc1_walk_full.png
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\MainMenu.png
