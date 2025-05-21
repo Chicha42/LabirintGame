@@ -6,10 +6,11 @@ namespace LabirintGame.Model
     {
         public int Health { get; set; }
         private static Maze _maze;
-        private readonly List<Key> CollectedKeys;
+        public readonly List<Key> CollectedKeys;
         public float DrawX { get; private set; }
         public float DrawY { get; private set; }
         private bool _isMoving;
+        public bool IsMoving => _isMoving;
         private float _moveProgress;
         private const float MoveDuration = 0.3f;
         private (int fromX, int fromY, int toX, int toY) _moveData;
@@ -73,25 +74,26 @@ namespace LabirintGame.Model
                 _maze.Grid[Y + dy, X + dx] == 19 ||
                 _maze.Grid[Y + dy, X + dx] == 18)
             {
-                foreach (var t in CollectedKeys.Where(t => t.Id +10 ==  _maze.Grid[Y + dy, X + dx]))
+                foreach (var t in CollectedKeys.Where(t => t.Id + 10 == _maze.Grid[Y + dy, X + dx]).ToList())
+                {
+                    CollectedKeys.Remove(t);
                     _maze.Grid[Y + dy, X + dx] = 1;
+                }
+                    
             }
         }
 
         private bool CanMoveTo(int x, int y)
         {
-            return x >= 0 && y >= 0 &&
-                x < _maze.Width-1 && y < _maze.Height-1 &&
-                _maze.Grid[y, x] != 0 &&
-                _maze.Grid[y, x] != 20 &&
-                _maze.Grid[y, x] != 19 &&
-                _maze.Grid[y, x] != 18;
+            if (x < 0 || y < 0 || x >= _maze.Width || y >= _maze.Height)
+                return false;
+            
+            var cell = _maze.Grid[y, x];
+            return cell != 0 && cell != 18 && cell != 19 && cell != 20; 
         }
-        
         private bool InBounds(int x, int y)
         {
-            return x >= 0 && y >= 0 &&
-                   x < _maze.Width - 1 && y < _maze.Height - 1;
+            return x >= 0 && y >= 0 && x < _maze.Width && y < _maze.Height;
         }
 
         public void Update(float deltaTime)

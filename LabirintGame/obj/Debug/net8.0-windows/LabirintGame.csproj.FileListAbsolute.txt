@@ -62,12 +62,9 @@ D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Ass
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\key.png
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\PlayerAnim.png
 D:\Projects\Rider Projects C#\MazeGame\LabirintGame\bin\Debug\net8.0-windows\Assets\wall.png
-C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\door_closed.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\floor.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\PlayerAnim.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\wall.png
-C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\MainMenuBG.png
-C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\WallBg.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\BlueKey.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\GreenDoor.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\GreenKey.png
@@ -98,3 +95,10 @@ D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-win
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\RedDoor.png
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\orc1_walk_full.png
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Debug\net8.0-windows\Assets\MainMenu.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\BlueDoor.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\MainMenu.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\orc1_walk_full.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\RedDoor.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\InvBlueKey.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\InvGreenKey.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\InvRedKey.png

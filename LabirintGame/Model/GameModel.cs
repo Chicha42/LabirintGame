@@ -18,5 +18,14 @@ namespace LabirintGame.Model
             Keys = new List<Key>();
             Doors = new List<Door>();
         }
+        
+        public GameModel(int[,] customGrid)
+        {
+            Maze = new Maze(customGrid);
+            Player = new Player(Maze, 1, 0, new List<Key>());
+            Enemies = new List<Enemy>();
+            Keys = new List<Key>();
+            Doors = new List<Door>();
+        }
     }
 }

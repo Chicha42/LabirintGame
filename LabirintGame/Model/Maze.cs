@@ -41,6 +41,8 @@ namespace LabirintGame.Model
         public Maze(int[,] customGrid)
         {
             Grid = customGrid;
+            Width = customGrid.GetLength(1);
+            Height = customGrid.GetLength(0);
         }
 
         private void GenerateMazeWithKeysAndDoors()

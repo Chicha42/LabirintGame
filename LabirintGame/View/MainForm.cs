@@ -5,7 +5,7 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace LabirintGame.View
 {
-    public sealed partial class MainForm : Form
+    public sealed partial class MainForm : Form, IGameView
     {
         private readonly GameController _controller;
         private const int CellSize = 200;
@@ -32,8 +32,10 @@ namespace LabirintGame.View
         private int _enemyAnimationTick;
         private const int EnemyFrameChangeRate = 10;
 
-
-    
+        
+        void IGameView.Invalidate() => this.Invalidate();
+        void IGameView.BeginInvoke(Action action) => this.BeginInvoke(action);
+        
         public MainForm()
         {   
             InitializeComponent();
@@ -52,9 +54,7 @@ namespace LabirintGame.View
             _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
             _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
             _enemySpriteSheet = new Bitmap("Assets/orc1_walk_full.png");
-
-
-
+            
             _controller = new GameController(this, 3);
 
             Paint += MainForm_Paint;
@@ -88,12 +88,10 @@ namespace LabirintGame.View
                 }
                 if (_escPressed) Application.Exit();
 
-                _isPlayerMoving = (dx != 0 || dy != 0) && _controller.Maze.Grid[_controller.Player.Y+dy, _controller.Player.X+dx] != 0;
-                if (_isPlayerMoving)
-                {
-                    _controller.MovePlayer(dx, dy);
-                }
-    
+                _controller.MovePlayer(dx, dy);
+                
+                _isPlayerMoving = _controller.Player.IsMoving;
+                
                 _controller.Update();
                 Invalidate();
             };  
@@ -146,6 +144,8 @@ namespace LabirintGame.View
             BordersPaint(g, sideBrush);
 
             HealthBarPaint(g);
+
+            DrawCollectedKeys(g);
         }
 
         private void MazePaint(Maze maze, int centerX, int centerY, Graphics g)
@@ -269,8 +269,8 @@ namespace LabirintGame.View
             var barHeight = 45;
             var margin = 30;
             
-            var HealthBarX = 0 + margin;
-            var HealthBarY = margin*3;
+            var HealthBarX = margin;
+            var HealthBarY = ClientSize.Height/2 - barHeight/2;
 
             var healthRatio = Math.Clamp(_controller.Player.Health / 100f, 0f, 1f);
 
@@ -282,6 +282,44 @@ namespace LabirintGame.View
             }
 
             g.DrawRectangle(Pens.Black, HealthBarX, HealthBarY, barWidth, barHeight);
+        }
+        
+        private void DrawCollectedKeys(Graphics g)
+        {
+            var panelWidth = 400;
+            var panelHeight = 150;
+            var margin = 20;
+            var xPos = ClientSize.Width - panelWidth - margin;
+            var yPos = ClientSize.Height/2 - panelHeight/2;
+        
+            using (var panelBrush = new SolidBrush(Color.FromArgb(150, 50, 50, 50)))
+            {
+                g.FillRectangle(panelBrush, xPos, yPos, panelWidth, panelHeight);
+                g.DrawRectangle(Pens.Gold, xPos, yPos, panelWidth, panelHeight);
+            }
+        
+            var keySize = 80;
+            var spacing = 20;
+            var startX = xPos + spacing;
+            var startY = yPos + (panelHeight - keySize) / 2;
+
+            foreach (var key in _controller.Player.CollectedKeys)
+            {
+                var keyTexture = GetKeyTexture(key.Id);
+                g.DrawImage(keyTexture, startX, startY, keySize, keySize);
+                startX += keySize + spacing;
+            }
+        }
+
+        private Bitmap GetKeyTexture(int keyId)
+        {
+            return keyId switch
+            {
+                8 => LoadTexture("Assets/InvGreenKey.png"),
+                9 => LoadTexture("Assets/InvRedKey.png"),
+                10 => LoadTexture("Assets/InvBlueKey.png"),
+                _ => _tileTextures[TileType.Floor]
+            };
         }
 
         private (int startX, int startY, int endX, int endY) GetVisibleBounds(Maze maze)

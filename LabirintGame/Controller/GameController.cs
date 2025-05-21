@@ -1,7 +1,5 @@
 using LabirintGame.Model;
 using LabirintGame.View;
-using System;
-using System.Security.Cryptography.Xml;
 using Timer = System.Windows.Forms.Timer;
 
 namespace LabirintGame.Controller
@@ -9,20 +7,18 @@ namespace LabirintGame.Controller
     public class GameController
     {
         private readonly GameModel _model;
-        private readonly MainForm _viewMain;
-        private readonly Training _viewTraining;
+        private readonly IGameView _view;
         private DateTime _lastUpdateTime;
         public float CameraX { get; private set; }
         public float CameraY { get; private set; }
-        private const float CameraFollowSpeed = 5f;
         private bool _isGameOver;
         public Maze Maze => _model.Maze;
         public Player Player => _model.Player;
         public IReadOnlyList<Enemy> Enemies => _model.Enemies;
 
-        public GameController(MainForm view, int enemyCount)
+        public GameController(IGameView view, int enemyCount)
         {
-            _viewMain = view;
+            _view = view;
             _model = new GameModel(21, 21, 4);
             _lastUpdateTime = DateTime.Now;
             
@@ -31,13 +27,13 @@ namespace LabirintGame.Controller
 
             SpawnEnemies(enemyCount);
         }
-
-        public GameController(Training view, int enemyCount)
+        
+        public GameController(IGameView view, int[,] customGrid, int enemyCount)
         {
-            _viewTraining = view;
-            _model = new GameModel(21, 21, 4);
+            _view = view;
+            _model = new GameModel(customGrid);
             _lastUpdateTime = DateTime.Now;
-            
+    
             CameraX = _model.Player.DrawX;
             CameraY = _model.Player.DrawY;
 
@@ -68,10 +64,10 @@ namespace LabirintGame.Controller
             {
                 _isGameOver = true;
                 MessageBox.Show("Вы победили!");
-                _viewMain.BeginInvoke(new Action(() => Application.Exit()));
+                _view.BeginInvoke(() => Application.Exit());
             }
 
-            _viewMain.Invalidate();
+            _view.Invalidate();
         }
 
         public void Update()
@@ -85,7 +81,7 @@ namespace LabirintGame.Controller
             UpdateEnemies(dt);
             UpdateCamera(dt);
             
-            _viewMain.Invalidate();
+            _view.Invalidate();
         }
 
         private void UpdateCamera(float dt)
@@ -159,7 +155,7 @@ namespace LabirintGame.Controller
                     {
                         _isGameOver = true;
                         MessageBox.Show("Game Over!");
-                        _viewMain.BeginInvoke((Action)(() => Application.Exit()));
+                        _view.BeginInvoke((Action)(() => Application.Exit()));
                     }
                 }
 

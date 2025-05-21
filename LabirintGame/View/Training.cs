@@ -4,7 +4,7 @@ using LabirintGame.Controller;
 using Timer = System.Windows.Forms.Timer;
 namespace LabirintGame.View;
 
-public partial class Training : Form
+public partial class Training : Form, IGameView
 {
     private readonly GameController _controller;
     private const int CellSize = 200;
@@ -30,6 +30,9 @@ public partial class Training : Form
     private int _enemyAnimationFrame;
     private int _enemyAnimationTick;
     private const int EnemyFrameChangeRate = 10;
+    
+    void IGameView.Invalidate() => this.Invalidate();
+    void IGameView.BeginInvoke(Action action) => this.BeginInvoke(action);
     public Training()
     {
         InitializeComponent();
@@ -38,18 +41,18 @@ public partial class Training : Form
         WindowState = FormWindowState.Maximized;
         KeyPreview = true;
         Resize += (_, _) => Invalidate();
-        _tileTextures[TileType.Wall] = LoadTexture("Assets/wall.png");
-        _tileTextures[TileType.Floor] = LoadTexture("Assets/floor.png");
-        _tileTextures[TileType.KeyBlue] = LoadTexture("Assets/BlueKey.png");
-        _tileTextures[TileType.KeyGreen] = LoadTexture("Assets/GreenKey.png");
-        _tileTextures[TileType.KeyRed] = LoadTexture("Assets/RedKey.png");
-        _tileTextures[TileType.DoorGreen] = LoadTexture("Assets/GreenDoor.png");
-        _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
-        _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
-        _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
-        _enemySpriteSheet = new Bitmap("Assets/orc1_walk_full.png");
+        LoadTextures();
+
+        var trainingGrid = new[,]
+        {
+            {0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+            {0,1,0,1,1,1,0,0,1,1,18,1,0,0},
+            {0,1,1,1,0,1,0,0,1,0,0,1,0,0},
+            {0,0,0,0,0,1,8,1,1,0,0,1,1,0},
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+        };
         
-        _controller = new GameController(this, 3);
+        _controller = new GameController(this, trainingGrid, 0);
         
         Paint += Training_Paint;
         
@@ -82,16 +85,28 @@ public partial class Training : Form
             }
             if (_escPressed) Application.Exit();
 
-            _isPlayerMoving = (dx != 0 || dy != 0) && _controller.Maze.Grid[_controller.Player.Y+dy, _controller.Player.X+dx] != 0;
-            if (_isPlayerMoving)
-            {
-                _controller.MovePlayer(dx, dy);
-            }
+            _controller.MovePlayer(dx, dy);
+    
+            _isPlayerMoving = _controller.Player.IsMoving;
     
             _controller.Update();
             Invalidate();
         };  
         _timer.Start();
+    }
+
+    private void LoadTextures()
+    {
+        _tileTextures[TileType.Wall] = LoadTexture("Assets/wall.png");
+        _tileTextures[TileType.Floor] = LoadTexture("Assets/floor.png");
+        _tileTextures[TileType.KeyBlue] = LoadTexture("Assets/BlueKey.png");
+        _tileTextures[TileType.KeyGreen] = LoadTexture("Assets/GreenKey.png");
+        _tileTextures[TileType.KeyRed] = LoadTexture("Assets/RedKey.png");
+        _tileTextures[TileType.DoorGreen] = LoadTexture("Assets/GreenDoor.png");
+        _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
+        _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
+        _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
+        _enemySpriteSheet = new Bitmap("Assets/orc1_walk_full.png");
     }
 
     private void Training_Paint(object? sender, PaintEventArgs e)
@@ -105,17 +120,8 @@ public partial class Training : Form
             
         var centerX = ClientSize.Width / 2;
         var centerY = ClientSize.Height / 2;
-
-        int[,] grid = new int[,]
-        {
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0},
-            {1,0,0,1,1,1,0,0,1,1,18,1,0,0},
-            {1,1,1,1,0,1,0,0,1,0,0,1,0,0},
-            {0,0,0,0,0,1,8,1,1,0,0,1,1,1},
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,1}
-        };
-            
-        MazePaint(grid, centerX, centerY, g);
+        
+        MazePaint(maze, centerX, centerY, g);
 
         PlayerPaint(centerX, centerY, g);
 
@@ -124,6 +130,8 @@ public partial class Training : Form
         BordersPaint(g, sideBrush);
 
         HealthBarPaint(g);
+
+        DrawCollectedKeys(g);
     }
     
     protected override void OnKeyDown(KeyEventArgs e)
@@ -151,30 +159,25 @@ public partial class Training : Form
         base.OnKeyUp(e);
     }
     
-    private void MazePaint(int[,] grid, int centerX, int centerY, Graphics g)
+    private void MazePaint(Maze maze, int centerX, int centerY, Graphics g)
     {
-        var (startX, startY, endX, endY) = GetVisibleBounds();
-
-        for (var y = startY; y <= endY; y++)
+        for (var y = 0; y < maze.Grid.GetLength(0); y++)
         {
-            for (var x = startX; x <= endX; x++)
+            for (var x = 0; x < maze.Grid.GetLength(1); x++)
             {
                 var screenX = centerX - (x - _controller.CameraX) * CellSize;
                 var screenY = centerY - (y - _controller.CameraY) * CellSize;
 
-                if (x >= 0 && x < 14 && y >= 0 && y < 5)
-                {
-                    var tileCode = grid[y, x];
-                    var tileType = GetTileType(tileCode);
+                var tileCode = maze.Grid[y, x];
+                var tileType = GetTileType(tileCode);
 
-                    if (!_tileTextures.TryGetValue(tileType, out var texture))
-                        texture = _tileTextures[TileType.Floor];
+                if (!_tileTextures.TryGetValue(tileType, out var texture))
+                    texture = _tileTextures[TileType.Floor];
 
-                    g.DrawImage(texture,
-                        screenX - CellSize / 2f,
-                        screenY - CellSize / 2f,
-                        CellSize, CellSize);
-                }
+                g.DrawImage(texture,
+                    screenX - CellSize / 2f,
+                    screenY - CellSize / 2f,
+                    CellSize, CellSize);
             }
         }
     }
@@ -285,6 +288,44 @@ public partial class Training : Form
         }
 
         g.DrawRectangle(Pens.Black, HealthBarX, HealthBarY, barWidth, barHeight);
+    }
+    
+    private void DrawCollectedKeys(Graphics g)
+    {
+        var panelWidth = 400;
+        var panelHeight = 150;
+        var margin = 20;
+        var xPos = ClientSize.Width - panelWidth - margin;
+        var yPos = ClientSize.Height/2 - panelHeight/2;
+        
+        using (var panelBrush = new SolidBrush(Color.FromArgb(150, 50, 50, 50)))
+        {
+            g.FillRectangle(panelBrush, xPos, yPos, panelWidth, panelHeight);
+            g.DrawRectangle(Pens.Gold, xPos, yPos, panelWidth, panelHeight);
+        }
+        
+        var keySize = 80;
+        var spacing = 20;
+        var startX = xPos + spacing;
+        var startY = yPos + (panelHeight - keySize) / 2;
+
+        foreach (var key in _controller.Player.CollectedKeys)
+        {
+            var keyTexture = GetKeyTexture(key.Id);
+            g.DrawImage(keyTexture, startX, startY, keySize, keySize);
+            startX += keySize + spacing;
+        }
+    }
+
+    private Bitmap GetKeyTexture(int keyId)
+    {
+        return keyId switch
+        {
+            8 => LoadTexture("Assets/InvGreenKey.png"),
+            9 => LoadTexture("Assets/InvRedKey.png"),
+            10 => LoadTexture("Assets/InvBlueKey.png"),
+            _ => _tileTextures[TileType.Floor]
+        };
     }
     
     private (int startX, int startY, int endX, int endY) GetVisibleBounds()
