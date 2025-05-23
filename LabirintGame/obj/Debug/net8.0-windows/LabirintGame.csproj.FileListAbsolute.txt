@@ -102,3 +102,4 @@ C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\InvBlueKey.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\InvGreenKey.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\InvRedKey.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Debug\net8.0-windows\Assets\alagard-12px-unicode.ttf

@@ -15,6 +15,7 @@ namespace LabirintGame.Controller
         public Maze Maze => _model.Maze;
         public Player Player => _model.Player;
         public IReadOnlyList<Enemy> Enemies => _model.Enemies;
+        public Action _onWin { get; set; }
 
         public GameController(IGameView view, int enemyCount)
         {
@@ -63,8 +64,7 @@ namespace LabirintGame.Controller
                 _model.Player.Y == _model.Maze.Height - 2)
             {
                 _isGameOver = true;
-                MessageBox.Show("Вы победили!");
-                _view.BeginInvoke(() => Application.Exit());
+                _onWin.Invoke();
             }
 
             _view.Invalidate();

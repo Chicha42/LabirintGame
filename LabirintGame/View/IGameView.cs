@@ -4,4 +4,5 @@ public interface IGameView
 {
     void Invalidate();
     void BeginInvoke(Action action);
+    Form GetForm();
 }

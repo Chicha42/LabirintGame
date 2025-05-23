@@ -11,11 +11,12 @@ namespace LabirintGame.View
         private const int CellSize = 200;
         private readonly Timer _timer = new Timer();
         private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
-        private Bitmap wall, floor, blueKey;
+        private Bitmap _wall, _floor, _blueKey;
         private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
+        public Form GetForm() => this;
         
         //Анимация главного героя
-        private Bitmap _playerSpriteSheet;
+        private readonly Bitmap _playerSpriteSheet;
         private const int SpriteSize = 32;
         private const int FramesPerDirection = 4;
         private int _animationFrame;
@@ -25,7 +26,7 @@ namespace LabirintGame.View
         private int _playerDirection;
         
         //Анимация врага
-        private Bitmap _enemySpriteSheet;
+        private readonly Bitmap _enemySpriteSheet;
         private const int EnemySpriteSize = 64;
         private const int EnemyFramesPerDirection = 6;
         private int _enemyAnimationFrame;
@@ -269,19 +270,19 @@ namespace LabirintGame.View
             var barHeight = 45;
             var margin = 30;
             
-            var HealthBarX = margin;
-            var HealthBarY = ClientSize.Height/2 - barHeight/2;
+            var healthBarX = margin;
+            var healthBarY = ClientSize.Height/2 - barHeight/2;
 
             var healthRatio = Math.Clamp(_controller.Player.Health / 100f, 0f, 1f);
 
-            g.FillRectangle(Brushes.Gray, HealthBarX, HealthBarY, barWidth, barHeight);
+            g.FillRectangle(Brushes.Gray, healthBarX, healthBarY, barWidth, barHeight);
 
             using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0))) // Dark red
             {
-                g.FillRectangle(healthBrush, HealthBarX, HealthBarY, barWidth * healthRatio, barHeight);
+                g.FillRectangle(healthBrush, healthBarX, healthBarY, barWidth * healthRatio, barHeight);
             }
 
-            g.DrawRectangle(Pens.Black, HealthBarX, HealthBarY, barWidth, barHeight);
+            g.DrawRectangle(Pens.Black, healthBarX, healthBarY, barWidth, barHeight);
         }
         
         private void DrawCollectedKeys(Graphics g)

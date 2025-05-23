@@ -1,17 +1,19 @@
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using LabirintGame.Model;
 using LabirintGame.Controller;
 using Timer = System.Windows.Forms.Timer;
 namespace LabirintGame.View;
 
-public partial class Training : Form, IGameView
+public sealed partial class Training : Form, IGameView
 {
     private readonly GameController _controller;
     private const int CellSize = 200;
     private readonly Timer _timer = new Timer();
     private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
-    private Bitmap wall, floor, blueKey;
+    private Bitmap _wall, _floor, _blueKey;
     private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
+    public Form GetForm() => this;
         
     //Анимация главного героя
     private Bitmap _playerSpriteSheet;
@@ -31,8 +33,17 @@ public partial class Training : Form, IGameView
     private int _enemyAnimationTick;
     private const int EnemyFrameChangeRate = 10;
     
-    void IGameView.Invalidate() => this.Invalidate();
-    void IGameView.BeginInvoke(Action action) => this.BeginInvoke(action);
+    //Для показа сообщений обучения
+    private string _currentTutorialText;
+    private bool _showedKeyTutorial;
+    private bool _showedDoorTutorial;
+    private readonly Timer _tutorialTimer = new();
+    private readonly int _tutorialDisplayTime = 5000;
+    private readonly Font _tutorialFont;
+    private bool _isMessageShown;
+    
+    void IGameView.Invalidate() => Invalidate();
+    void IGameView.BeginInvoke(Action action) => BeginInvoke(action);
     public Training()
     {
         InitializeComponent();
@@ -42,23 +53,54 @@ public partial class Training : Form, IGameView
         KeyPreview = true;
         Resize += (_, _) => Invalidate();
         LoadTextures();
+        
+        _tutorialTimer.Interval = _tutorialDisplayTime;
+        _tutorialTimer.Tick += (s, e) => { 
+            HideTutorialMessage();
+            _tutorialTimer.Stop();
+        };
+        
+        ShowTutorialMessage("Добро пожаловать в обучение.\nДля начала - перемещение:\nчтобы ходить нажимайте WASD");
+        
+        try 
+        {
+            var fontCollection = new PrivateFontCollection();
+            fontCollection.AddFontFile("Assets/alagard-12px-unicode.ttf");
+            _tutorialFont = new Font(fontCollection.Families[0], 24);
+        }
+        catch
+        {
+            _tutorialFont = new Font("Arial", 14, FontStyle.Bold);
+        }
 
         var trainingGrid = new[,]
         {
             {0,1,0,0,0,0,0,0,0,0,0,0,0,0},
-            {0,1,0,1,1,1,0,0,1,1,18,1,0,0},
-            {0,1,1,1,0,1,0,0,1,0,0,1,0,0},
-            {0,0,0,0,0,1,8,1,1,0,0,1,1,0},
+            {0,1,0,1,1,1,0,0,1,1,19,1,0,0},
+            {0,1,0,1,0,1,0,0,1,0,0,1,0,0},
+            {0,1,1,1,0,1,9,1,1,0,0,1,1,0},
             {0,0,0,0,0,0,0,0,0,0,0,0,0,0}
         };
-        
-        _controller = new GameController(this, trainingGrid, 0);
+
+        _controller = new GameController(this, trainingGrid, 0)
+        {
+            _onWin = () =>
+            {
+                {
+                    var nextForm = new TrainingEnemy();
+                    nextForm.Show();
+                    Close();
+                }
+            }
+        };
         
         Paint += Training_Paint;
         
         _timer.Interval = 10;
         _timer.Tick += (_, _) =>
         {
+            if (_isMessageShown) return;
+            
             int dx = 0, dy = 0;
             if (_wPressed)
             {
@@ -86,13 +128,62 @@ public partial class Training : Form, IGameView
             if (_escPressed) Application.Exit();
 
             _controller.MovePlayer(dx, dy);
-    
+
             _isPlayerMoving = _controller.Player.IsMoving;
-    
+
+            if (_controller.Player.X == 5 && _controller.Player.Y == 2 && _showedKeyTutorial == false)
+            {
+                ShowTutorialMessage("Это ключ!\nЧтобы подобрать его,\nпросто пройди сквозь него");
+                _showedKeyTutorial = true;
+            }
+            
+            if (_controller.Player.X == 8 && _controller.Player.Y == 3 && _showedDoorTutorial == false)
+            {
+                ShowTutorialMessage("Дальше дверь.\nПросто попытайся пройти через неё, \n если у тебя есть ключ, \nто она откроется");
+                _showedDoorTutorial = true;
+            }
+                
             _controller.Update();
             Invalidate();
         };  
         _timer.Start();
+    }
+    
+    private List<(int X, int Y)> GetKeyPositions()
+    {
+        var keys = new List<(int, int)>();
+        var grid = _controller.Maze.Grid;
+    
+        for (var y = 0; y < grid.GetLength(0); y++)
+        {
+            for (var x = 0; x < grid.GetLength(1); x++)
+            {
+                if (grid[y, x] == 8 || grid[y, x] == 9 || grid[y, x] == 10)
+                    keys.Add((x, y));
+            }
+        }
+        return keys;
+    }
+    private void ShowTutorialMessage(string message)
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(() => ShowTutorialMessage(message)));
+            return;
+        }
+
+        _isMessageShown = true;
+        _currentTutorialText = message;
+        _tutorialTimer.Stop();
+        _tutorialTimer.Start();
+        Invalidate();
+    }
+
+    private void HideTutorialMessage()
+    {
+        _isMessageShown = false;
+        _currentTutorialText = "";
+        Invalidate();
     }
 
     private void LoadTextures()
@@ -121,17 +212,61 @@ public partial class Training : Form, IGameView
         var centerX = ClientSize.Width / 2;
         var centerY = ClientSize.Height / 2;
         
-        MazePaint(maze, centerX, centerY, g);
+        DrawMaze(maze, centerX, centerY, g);
 
-        PlayerPaint(centerX, centerY, g);
+        DrawPlayer(centerX, centerY, g);
 
-        EnemyPaint(g);
+        DrawEnemy(g);
             
-        BordersPaint(g, sideBrush);
+        DrawBorders(g, sideBrush);
 
-        HealthBarPaint(g);
+        DrawHealthBar(g);
 
         DrawCollectedKeys(g);
+        
+        if (!string.IsNullOrEmpty(_currentTutorialText))
+        {
+            DrawTutorialMessage(e.Graphics);
+        }
+    }
+    
+    private void DrawTutorialMessage(Graphics g)
+    {
+        var backgroundColor = Color.FromArgb(255, 55, 49, 64);
+        var borderColor = Color.FromArgb(255, 79, 80, 100);
+    
+        var textSize = g.MeasureString(_currentTutorialText, _tutorialFont);
+        
+        var padding = 30;
+        var borderWidth = 4;
+        var windowWidth = (int)textSize.Width + padding * 2;
+        var windowHeight = (int)textSize.Height + padding * 2;
+    
+        var rect = new Rectangle(
+            ClientSize.Width / 2 - windowWidth / 2,
+            ClientSize.Height / 2 - windowHeight / 2,
+            windowWidth,
+            windowHeight);
+    
+        using (var bgBrush = new SolidBrush(backgroundColor))
+        using (var borderPen = new Pen(borderColor, borderWidth))
+        {
+            var borderRect = new Rectangle(
+                rect.X - borderWidth / 2,
+                rect.Y - borderWidth / 2,
+                rect.Width + borderWidth,
+                rect.Height + borderWidth);
+        
+            g.FillRectangle(bgBrush, rect);
+            g.DrawRectangle(borderPen, borderRect);
+        }
+    
+        using (var format = new StringFormat())
+        {
+            format.Alignment = StringAlignment.Center;
+            format.LineAlignment = StringAlignment.Center;
+            g.DrawString(_currentTutorialText, _tutorialFont, Brushes.White, rect, format);
+        }
     }
     
     protected override void OnKeyDown(KeyEventArgs e)
@@ -159,7 +294,17 @@ public partial class Training : Form, IGameView
         base.OnKeyUp(e);
     }
     
-    private void MazePaint(Maze maze, int centerX, int centerY, Graphics g)
+    protected override void OnMouseClick(MouseEventArgs e)
+    {
+        base.OnMouseClick(e);
+    
+        if (!string.IsNullOrEmpty(_currentTutorialText))
+        {
+            HideTutorialMessage();
+        }
+    }
+    
+    private void DrawMaze(Maze maze, int centerX, int centerY, Graphics g)
     {
         for (var y = 0; y < maze.Grid.GetLength(0); y++)
         {
@@ -182,7 +327,7 @@ public partial class Training : Form, IGameView
         }
     }
     
-    private void PlayerPaint(int centerX, int centerY, Graphics g)
+    private void DrawPlayer(int centerX, int centerY, Graphics g)
     {
         if (_isPlayerMoving)
         {
@@ -212,7 +357,7 @@ public partial class Training : Form, IGameView
         g.DrawImage(_playerSpriteSheet, destRect, srcRect, GraphicsUnit.Pixel);
     }
     
-    private void BordersPaint(Graphics g, SolidBrush sideBrush)
+    private void DrawBorders(Graphics g, SolidBrush sideBrush)
     {
         g.FillRectangle(sideBrush,
             0f,
@@ -226,7 +371,7 @@ public partial class Training : Form, IGameView
             (float)ClientSize.Height);
     }
     
-    private void EnemyPaint(Graphics g)
+    private void DrawEnemy(Graphics g)
     {
             
         _enemyAnimationTick++;
@@ -269,25 +414,25 @@ public partial class Training : Form, IGameView
         }
     }
     
-    private void HealthBarPaint(Graphics g)
+    private void DrawHealthBar(Graphics g)
     {
         var barWidth = 400;
         var barHeight = 45;
         var margin = 30;
             
-        var HealthBarX = 0 + margin;
-        var HealthBarY = margin*3;
+        var healthBarX = margin;
+        var healthBarY = ClientSize.Height/2 - barHeight/2;
 
         var healthRatio = Math.Clamp(_controller.Player.Health / 100f, 0f, 1f);
 
-        g.FillRectangle(Brushes.Gray, HealthBarX, HealthBarY, barWidth, barHeight);
+        g.FillRectangle(Brushes.Gray, healthBarX, healthBarY, barWidth, barHeight);
 
         using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0))) // Dark red
         {
-            g.FillRectangle(healthBrush, HealthBarX, HealthBarY, barWidth * healthRatio, barHeight);
+            g.FillRectangle(healthBrush, healthBarX, healthBarY, barWidth * healthRatio, barHeight);
         }
 
-        g.DrawRectangle(Pens.Black, HealthBarX, HealthBarY, barWidth, barHeight);
+        g.DrawRectangle(Pens.Black, healthBarX, healthBarY, barWidth, barHeight);
     }
     
     private void DrawCollectedKeys(Graphics g)
@@ -326,23 +471,6 @@ public partial class Training : Form, IGameView
             10 => LoadTexture("Assets/InvBlueKey.png"),
             _ => _tileTextures[TileType.Floor]
         };
-    }
-    
-    private (int startX, int startY, int endX, int endY) GetVisibleBounds()
-    {
-        var visibleCellsX = (int)Math.Ceiling(ClientSize.Width / (float)CellSize) + 2;
-        var visibleCellsY = (int)Math.Ceiling(ClientSize.Height / (float)CellSize) + 2;
-
-            
-        var startX = (int)Math.Floor(_controller.CameraX - visibleCellsX / 2f);
-        var startY = (int)Math.Floor(_controller.CameraY - visibleCellsY / 2f);
-        var endX = startX + visibleCellsX;
-        var endY = startY + visibleCellsY;
-            
-        return (Math.Max(0, startX),
-            Math.Max(0, startY), 
-            Math.Min(14 - 1, endX),
-            Math.Min(5 - 1, endY));
     }
     
     private static TileType GetTileType(int code)

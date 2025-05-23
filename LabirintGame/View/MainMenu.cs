@@ -2,7 +2,7 @@ namespace LabirintGame.View;
 
 public partial class MainMenu : Form
 {
-    private Button[] buttons;
+    private readonly Button[] _buttons;
     public MainMenu()
     {
         InitializeComponent();
@@ -12,7 +12,7 @@ public partial class MainMenu : Form
         KeyPreview = true;
         Resize += (s, e) => Invalidate();
 
-        buttons =
+        _buttons =
         [
             CreateButton( 384, trainingButton_click),
             CreateButton(603, startButton_Click),
@@ -20,7 +20,7 @@ public partial class MainMenu : Form
         ];
         
         
-        foreach (var btn in buttons)
+        foreach (var btn in _buttons)
             Controls.Add(btn);
 
         Paint += MainMenu_Paint;
@@ -71,14 +71,14 @@ public partial class MainMenu : Form
     private void CenterButtons()
     {
         var spacing = 15;
-        var buttonHeight = buttons[0].Height;
-        var totalHeight = buttons.Length * buttonHeight + (buttons.Length - 1) * spacing;
+        var buttonHeight = _buttons[0].Height;
+        var totalHeight = _buttons.Length * buttonHeight + (_buttons.Length - 1) * spacing;
         var startY = (ClientSize.Height - totalHeight) / 2;
 
-        for (var i = 0; i < buttons.Length; i++)
+        for (var i = 0; i < _buttons.Length; i++)
         {
-            buttons[i].Top = startY + i * (buttonHeight + spacing);
-            buttons[i].Left = (ClientSize.Width - buttons[i].Width) / 2;
+            _buttons[i].Top = startY + i * (buttonHeight + spacing);
+            _buttons[i].Left = (ClientSize.Width - _buttons[i].Width) / 2;
         }
     }
     private void exitButton_Click(object sender, EventArgs e)

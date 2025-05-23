@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace LabirintGame.View;
 
-sealed partial class Training
+partial class TrainingEnemy
 {
     /// <summary>
     /// Required designer variable.
@@ -34,7 +34,7 @@ sealed partial class Training
         this.components = new System.ComponentModel.Container();
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         this.ClientSize = new System.Drawing.Size(800, 450);
-        this.Text = "Training";
+        this.Text = "TrainingEnemy";
     }
 
     #endregion
