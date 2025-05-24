@@ -34,8 +34,8 @@ namespace LabirintGame.View
         private const int EnemyFrameChangeRate = 10;
 
         
-        void IGameView.Invalidate() => this.Invalidate();
-        void IGameView.BeginInvoke(Action action) => this.BeginInvoke(action);
+        void IGameView.Invalidate() => Invalidate();
+        void IGameView.BeginInvoke(Action action) => BeginInvoke(action);
         
         public MainForm()
         {   
@@ -213,12 +213,12 @@ namespace LabirintGame.View
                 0f,
                 0f,
                 CellSize*2.3f,
-                (float)ClientSize.Height);
+                ClientSize.Height);
             g.FillRectangle(sideBrush,
                 ClientSize.Width-(CellSize*2.3f),
                 0f,
                 CellSize*2.3f,
-                (float)ClientSize.Height);
+                ClientSize.Height);
         }
 
         private void EnemyPaint(Graphics g)
@@ -364,8 +364,8 @@ namespace LabirintGame.View
             var resized = new Bitmap(original.Width, original.Height);
 
             using var g = Graphics.FromImage(resized);
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            g.InterpolationMode = InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = PixelOffsetMode.Half;
             g.DrawImage(original, 0, 0, resized.Width, resized.Height);
 
             return resized;

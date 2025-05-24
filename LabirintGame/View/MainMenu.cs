@@ -31,7 +31,7 @@ public partial class MainMenu : Form
     {
         var trainingForm = new Training();
         trainingForm.Show();
-        this.Hide();
+        Hide();
     }
 
     private Button CreateButton(int top, EventHandler onClick)
@@ -66,21 +66,9 @@ public partial class MainMenu : Form
     {
         var gameForm = new MainForm();
         gameForm.Show();
-        this.Hide();
+        Hide();
     }
-    private void CenterButtons()
-    {
-        var spacing = 15;
-        var buttonHeight = _buttons[0].Height;
-        var totalHeight = _buttons.Length * buttonHeight + (_buttons.Length - 1) * spacing;
-        var startY = (ClientSize.Height - totalHeight) / 2;
-
-        for (var i = 0; i < _buttons.Length; i++)
-        {
-            _buttons[i].Top = startY + i * (buttonHeight + spacing);
-            _buttons[i].Left = (ClientSize.Width - _buttons[i].Width) / 2;
-        }
-    }
+    
     private void exitButton_Click(object sender, EventArgs e)
     {
         Application.Exit();
@@ -101,11 +89,6 @@ public partial class MainMenu : Form
     public void MainMenu_Paint(object sender, PaintEventArgs e)
     {
         var g = e.Graphics;
-    
-        // Фон
-
-    
-        // Текст поверх кнопок
         using var textImage = new Bitmap("Assets/MainMenu.png");
         g.DrawImage(textImage, 0, 0, ClientSize.Width, ClientSize.Height);
     }

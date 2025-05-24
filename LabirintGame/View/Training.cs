@@ -41,6 +41,8 @@ public sealed partial class Training : Form, IGameView
     private readonly int _tutorialDisplayTime = 5000;
     private readonly Font _tutorialFont;
     private bool _isMessageShown;
+    private readonly Dictionary<string, Bitmap> _tutorialImages = new();
+    private Bitmap _currentTutorialImage;
     
     void IGameView.Invalidate() => Invalidate();
     void IGameView.BeginInvoke(Action action) => BeginInvoke(action);
@@ -60,18 +62,7 @@ public sealed partial class Training : Form, IGameView
             _tutorialTimer.Stop();
         };
         
-        ShowTutorialMessage("Добро пожаловать в обучение.\nДля начала - перемещение:\nчтобы ходить нажимайте WASD");
-        
-        try 
-        {
-            var fontCollection = new PrivateFontCollection();
-            fontCollection.AddFontFile("Assets/alagard-12px-unicode.ttf");
-            _tutorialFont = new Font(fontCollection.Families[0], 24);
-        }
-        catch
-        {
-            _tutorialFont = new Font("Arial", 14, FontStyle.Bold);
-        }
+        ShowTutorialImage("welcome");
 
         var trainingGrid = new[,]
         {
@@ -133,13 +124,13 @@ public sealed partial class Training : Form, IGameView
 
             if (_controller.Player.X == 5 && _controller.Player.Y == 2 && _showedKeyTutorial == false)
             {
-                ShowTutorialMessage("Это ключ!\nЧтобы подобрать его,\nпросто пройди сквозь него");
+                ShowTutorialImage("keyTutorial");
                 _showedKeyTutorial = true;
             }
             
             if (_controller.Player.X == 8 && _controller.Player.Y == 3 && _showedDoorTutorial == false)
             {
-                ShowTutorialMessage("Дальше дверь.\nПросто попытайся пройти через неё, \n если у тебя есть ключ, \nто она откроется");
+                ShowTutorialImage("doorTutorial");
                 _showedDoorTutorial = true;
             }
                 
@@ -148,41 +139,29 @@ public sealed partial class Training : Form, IGameView
         };  
         _timer.Start();
     }
-    
-    private List<(int X, int Y)> GetKeyPositions()
-    {
-        var keys = new List<(int, int)>();
-        var grid = _controller.Maze.Grid;
-    
-        for (var y = 0; y < grid.GetLength(0); y++)
-        {
-            for (var x = 0; x < grid.GetLength(1); x++)
-            {
-                if (grid[y, x] == 8 || grid[y, x] == 9 || grid[y, x] == 10)
-                    keys.Add((x, y));
-            }
-        }
-        return keys;
-    }
-    private void ShowTutorialMessage(string message)
+
+    private void ShowTutorialImage(string imageKey)
     {
         if (InvokeRequired)
         {
-            BeginInvoke(new Action(() => ShowTutorialMessage(message)));
+            BeginInvoke(new Action(() => ShowTutorialImage(imageKey)));
             return;
         }
 
-        _isMessageShown = true;
-        _currentTutorialText = message;
-        _tutorialTimer.Stop();
-        _tutorialTimer.Start();
-        Invalidate();
+        if (_tutorialImages.TryGetValue(imageKey, out var image))
+        {
+            _currentTutorialImage = image;
+            _isMessageShown = true;
+            _tutorialTimer.Stop();
+            _tutorialTimer.Start();
+            Invalidate();
+        }
     }
 
     private void HideTutorialMessage()
     {
+        _currentTutorialImage = null;
         _isMessageShown = false;
-        _currentTutorialText = "";
         Invalidate();
     }
 
@@ -198,6 +177,9 @@ public sealed partial class Training : Form, IGameView
         _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
         _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
         _enemySpriteSheet = new Bitmap("Assets/orc1_walk_full.png");
+        _tutorialImages["welcome"] = LoadTexture("Assets/Welcome.png");
+        _tutorialImages["keyTutorial"] = LoadTexture("Assets/KeyTutorial.png");
+        _tutorialImages["doorTutorial"] = LoadTexture("Assets/DoorTutorial.png");
     }
 
     private void Training_Paint(object? sender, PaintEventArgs e)
@@ -224,48 +206,9 @@ public sealed partial class Training : Form, IGameView
 
         DrawCollectedKeys(g);
         
-        if (!string.IsNullOrEmpty(_currentTutorialText))
-        {
-            DrawTutorialMessage(e.Graphics);
-        }
-    }
-    
-    private void DrawTutorialMessage(Graphics g)
-    {
-        var backgroundColor = Color.FromArgb(255, 55, 49, 64);
-        var borderColor = Color.FromArgb(255, 79, 80, 100);
-    
-        var textSize = g.MeasureString(_currentTutorialText, _tutorialFont);
-        
-        var padding = 30;
-        var borderWidth = 4;
-        var windowWidth = (int)textSize.Width + padding * 2;
-        var windowHeight = (int)textSize.Height + padding * 2;
-    
-        var rect = new Rectangle(
-            ClientSize.Width / 2 - windowWidth / 2,
-            ClientSize.Height / 2 - windowHeight / 2,
-            windowWidth,
-            windowHeight);
-    
-        using (var bgBrush = new SolidBrush(backgroundColor))
-        using (var borderPen = new Pen(borderColor, borderWidth))
-        {
-            var borderRect = new Rectangle(
-                rect.X - borderWidth / 2,
-                rect.Y - borderWidth / 2,
-                rect.Width + borderWidth,
-                rect.Height + borderWidth);
-        
-            g.FillRectangle(bgBrush, rect);
-            g.DrawRectangle(borderPen, borderRect);
-        }
-    
-        using (var format = new StringFormat())
-        {
-            format.Alignment = StringAlignment.Center;
-            format.LineAlignment = StringAlignment.Center;
-            g.DrawString(_currentTutorialText, _tutorialFont, Brushes.White, rect, format);
+        if (_currentTutorialImage != null)
+        { 
+            g.DrawImage(_currentTutorialImage, 0, 0, ClientSize.Width, ClientSize.Height);
         }
     }
     
@@ -297,11 +240,9 @@ public sealed partial class Training : Form, IGameView
     protected override void OnMouseClick(MouseEventArgs e)
     {
         base.OnMouseClick(e);
-    
-        if (!string.IsNullOrEmpty(_currentTutorialText))
-        {
-            HideTutorialMessage();
-        }
+
+        HideTutorialMessage();
+        _tutorialTimer.Stop();
     }
     
     private void DrawMaze(Maze maze, int centerX, int centerY, Graphics g)
@@ -363,12 +304,12 @@ public sealed partial class Training : Form, IGameView
             0f,
             0f,
             CellSize*2.3f,
-            (float)ClientSize.Height);
+            ClientSize.Height);
         g.FillRectangle(sideBrush,
             ClientSize.Width-(CellSize*2.3f),
             0f,
             CellSize*2.3f,
-            (float)ClientSize.Height);
+            ClientSize.Height);
     }
     
     private void DrawEnemy(Graphics g)
@@ -497,8 +438,8 @@ public sealed partial class Training : Form, IGameView
             var resized = new Bitmap(original.Width, original.Height);
 
             using var g = Graphics.FromImage(resized);
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            g.InterpolationMode = InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = PixelOffsetMode.Half;
             g.DrawImage(original, 0, 0, resized.Width, resized.Height);
 
             return resized;
