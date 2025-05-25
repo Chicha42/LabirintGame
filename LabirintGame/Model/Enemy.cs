@@ -35,7 +35,7 @@ namespace LabirintGame.Model
             _isMoving = false;
             CurrentState = EnemyState.Wandering;
         }
-        
+
         public bool IsMoving => _isMoving;
         
         public void Move(int dx, int dy)

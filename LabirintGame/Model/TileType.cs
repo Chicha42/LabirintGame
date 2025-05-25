@@ -4,7 +4,7 @@ namespace LabirintGame.Model
     {
         Wall,
         Floor,
-        Player,
+        Finish,
         KeyBlue,
         KeyRed,
         KeyGreen,

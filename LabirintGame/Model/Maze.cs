@@ -5,12 +5,12 @@ namespace LabirintGame.Model
         public int[,] Grid { get; private set; }
         public int Width { get; }
         public int Height { get; }
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
 
         private readonly List<Key> _keys = [];
         private readonly List<Door> _doors = [];
         
-        public readonly Dictionary<int, Color> KeyColors = new Dictionary<int, Color>()
+        public readonly Dictionary<int, Color> KeyColors = new()
         {
             {0, Color.Red },    
             {1, Color.Green},  
@@ -18,24 +18,24 @@ namespace LabirintGame.Model
             
         };
 
-        private static readonly Dictionary<int, Color> DoorColors = new Dictionary<int, Color>()
+        private static readonly Dictionary<int, Color> DoorColors = new()
         {
             {0, Color.DarkRed},
             {1, Color.DarkGreen},
             {2, Color.DarkBlue},
         };
 
-        public Maze(int width, int height, int numKeys)
+        public Maze(int width, int height, int numKeys, int branchesCount)
         {
             Width = width;
             Height = height;
             Grid = new int[height, width];
-            for (var i = 0; i < numKeys-1; i++)
+            for (var i = 0; i < numKeys; i++)
             {
                 _keys.Add(new Key(i, KeyColors[i], 0, 0));
                 _doors.Add(new Door(i,DoorColors[i], 0, 0));
             }
-            GenerateMazeWithKeysAndDoors();
+            GenerateMazeWithKeysAndDoors(branchesCount);
         }
         
         public Maze(int[,] customGrid)
@@ -45,7 +45,7 @@ namespace LabirintGame.Model
             Height = customGrid.GetLength(0);
         }
 
-        private void GenerateMazeWithKeysAndDoors()
+        private void GenerateMazeWithKeysAndDoors(int branchesCount)
         {
             for (var y = 0; y < Height; y++)
                 for (var x = 0; x < Width; x++)
@@ -58,7 +58,7 @@ namespace LabirintGame.Model
             foreach (var (x, y) in path)
                 Grid[y, x] = 1;
 
-            AddBranches(path, 15);
+            AddBranches(path, branchesCount);
 
             PlaceKeysAndDoors(_keys, _doors);
 
@@ -171,7 +171,7 @@ namespace LabirintGame.Model
         {
             var distances = new int[Height, Width];
             var visited = new bool[Height, Width];
-            Queue<(int x, int y)> queue = new Queue<(int, int)>();
+            Queue<(int x, int y)> queue = new();
 
             for (var y = 0; y < Height; y++)
                 for (var x = 0; x < Width; x++)

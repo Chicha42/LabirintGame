@@ -9,7 +9,7 @@ public sealed partial class Training : Form, IGameView
 {
     private readonly GameController _controller;
     private const int CellSize = 200;
-    private readonly Timer _timer = new Timer();
+    private readonly Timer _timer = new();
     private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
     private Bitmap _wall, _floor, _blueKey;
     private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
@@ -22,7 +22,7 @@ public sealed partial class Training : Form, IGameView
     private int _animationFrame;
     private int _animationTick;
     private const int FrameChangeRate = 10;
-    private bool _isPlayerMoving = false;
+    private bool _isPlayerMoving;
     private int _playerDirection;
         
     //Анимация врага
@@ -34,12 +34,10 @@ public sealed partial class Training : Form, IGameView
     private const int EnemyFrameChangeRate = 10;
     
     //Для показа сообщений обучения
-    private string _currentTutorialText;
     private bool _showedKeyTutorial;
     private bool _showedDoorTutorial;
     private readonly Timer _tutorialTimer = new();
     private readonly int _tutorialDisplayTime = 5000;
-    private readonly Font _tutorialFont;
     private bool _isMessageShown;
     private readonly Dictionary<string, Bitmap> _tutorialImages = new();
     private Bitmap _currentTutorialImage;
@@ -67,9 +65,9 @@ public sealed partial class Training : Form, IGameView
         var trainingGrid = new[,]
         {
             {0,1,0,0,0,0,0,0,0,0,0,0,0,0},
-            {0,1,0,1,1,1,0,0,1,1,19,1,0,0},
-            {0,1,0,1,0,1,0,0,1,0,0,1,0,0},
-            {0,1,1,1,0,1,9,1,1,0,0,1,1,0},
+            {0,1,0,1,1,1,0,0,1,1,19,1,1,0},
+            {0,1,0,1,0,1,0,0,1,0,0,0,1,0},
+            {0,1,1,1,0,1,9,1,1,0,0,0,3,0},
             {0,0,0,0,0,0,0,0,0,0,0,0,0,0}
         };
 
@@ -144,7 +142,7 @@ public sealed partial class Training : Form, IGameView
     {
         if (InvokeRequired)
         {
-            BeginInvoke(new Action(() => ShowTutorialImage(imageKey)));
+            BeginInvoke(() => ShowTutorialImage(imageKey));
             return;
         }
 
@@ -176,7 +174,8 @@ public sealed partial class Training : Form, IGameView
         _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
         _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
         _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
-        _enemySpriteSheet = new Bitmap("Assets/orc1_walk_full.png");
+        _enemySpriteSheet = new Bitmap("Assets/OrcWalk.png");
+        _tileTextures[TileType.Finish] = LoadTexture("Assets/Finish.png");
         _tutorialImages["welcome"] = LoadTexture("Assets/Welcome.png");
         _tutorialImages["keyTutorial"] = LoadTexture("Assets/KeyTutorial.png");
         _tutorialImages["doorTutorial"] = LoadTexture("Assets/DoorTutorial.png");
@@ -420,7 +419,7 @@ public sealed partial class Training : Form, IGameView
         {
             0 => TileType.Wall,
             1 => TileType.Floor,
-            3 => TileType.Player,
+            3 => TileType.Finish,
             8 => TileType.KeyGreen,
             9 => TileType.KeyRed,
             10 => TileType.KeyBlue,

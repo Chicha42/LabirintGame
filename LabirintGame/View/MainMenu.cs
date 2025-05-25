@@ -64,7 +64,7 @@ public partial class MainMenu : Form
 
     private void startButton_Click(object sender, EventArgs e)
     {
-        var gameForm = new MainForm();
+        var gameForm = new Prologue();
         gameForm.Show();
         Hide();
     }

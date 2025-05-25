@@ -9,7 +9,7 @@ public sealed partial class TrainingEnemy : Form, IGameView
 {
     private readonly GameController _controller;
     private const int CellSize = 200;
-    private readonly Timer _timer = new Timer();
+    private readonly Timer _timer = new();
     private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
     private Bitmap _wall, _floor, _blueKey;
     private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
@@ -22,7 +22,7 @@ public sealed partial class TrainingEnemy : Form, IGameView
     private int _animationFrame;
     private int _animationTick;
     private const int FrameChangeRate = 10;
-    private bool _isPlayerMoving = false;
+    private bool _isPlayerMoving;
     private int _playerDirection;
         
     //Анимация врага
@@ -67,7 +67,7 @@ public sealed partial class TrainingEnemy : Form, IGameView
             {0,1,0,1,0,1,0,1,0,1,0,1,0},
             {0,1,1,1,0,1,1,1,0,1,0,1,0},
             {0,1,0,0,0,1,0,0,0,0,0,1,0},
-            {0,1,1,1,0,1,1,1,1,0,0,1,0},
+            {0,1,1,1,0,1,1,1,1,0,0,3,0},
             {0,0,0,0,0,0,0,0,0,0,0,0,0}
         };
 
@@ -76,12 +76,14 @@ public sealed partial class TrainingEnemy : Form, IGameView
             _onWin = () =>
             {
                 {
-                    var nextForm = new TrainingEnemy();
+                    var nextForm = new Prologue();
                     nextForm.Show();
                     Close();
                 }
             }
         };
+
+        _controller.AddEnemyAtPosition(5, 5);
         
         Paint += Training_Paint;
         
@@ -130,7 +132,7 @@ public sealed partial class TrainingEnemy : Form, IGameView
     {
         if (InvokeRequired)
         {
-            BeginInvoke(new Action(() => ShowTutorialImage(imageKey)));
+            BeginInvoke(() => ShowTutorialImage(imageKey));
             return;
         }
 
@@ -172,8 +174,9 @@ public sealed partial class TrainingEnemy : Form, IGameView
         _tileTextures[TileType.DoorGreen] = LoadTexture("Assets/GreenDoor.png");
         _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
         _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
+        _tileTextures[TileType.Finish] = LoadTexture("Assets/Finish.png");
         _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
-        _enemySpriteSheet = new Bitmap("Assets/orc1_walk_full.png");
+        _enemySpriteSheet = new Bitmap("Assets/OrcWalk.png");
         _tutorialImages["enemyTutor1"] = LoadTexture("Assets/EnemyTutor1.png");
         _tutorialImages["enemyTutor2"] = LoadTexture("Assets/EnemyTutor2.png");
         _tutorialImages["enemyTutor3"] = LoadTexture("Assets/EnemyTutor3.png");
@@ -314,7 +317,6 @@ public sealed partial class TrainingEnemy : Form, IGameView
     
     private void DrawEnemy(Graphics g)
     {
-            
         _enemyAnimationTick++;
         foreach (var en in _controller.Enemies)
         {
@@ -368,7 +370,7 @@ public sealed partial class TrainingEnemy : Form, IGameView
 
         g.FillRectangle(Brushes.Gray, healthBarX, healthBarY, barWidth, barHeight);
 
-        using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0))) // Dark red
+        using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0)))
         {
             g.FillRectangle(healthBrush, healthBarX, healthBarY, barWidth * healthRatio, barHeight);
         }
@@ -420,7 +422,7 @@ public sealed partial class TrainingEnemy : Form, IGameView
         {
             0 => TileType.Wall,
             1 => TileType.Floor,
-            3 => TileType.Player,
+            3 => TileType.Finish,
             8 => TileType.KeyGreen,
             9 => TileType.KeyRed,
             10 => TileType.KeyBlue,

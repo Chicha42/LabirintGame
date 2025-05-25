@@ -10,9 +10,9 @@ namespace LabirintGame.Model
         public List<Key> Keys { get; }
         public List<Door> Doors { get; }
 
-        public GameModel(int width, int height, int keysDoorsCount)
+        public GameModel(int width, int height, int keysDoorsCount, int branchesCount)
         {
-            Maze = new Maze(width, height, keysDoorsCount);
+            Maze = new Maze(width, height, keysDoorsCount, branchesCount);
             Player = new Player(Maze, 1, 0, new List<Key>());
             Enemies = new List<Enemy>();
             Keys = new List<Key>();

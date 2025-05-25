@@ -24,6 +24,18 @@
       <Compile Update="View\TrainingEnemy.cs">
         <SubType>Form</SubType>
       </Compile>
+      <Compile Update="View\Prologue.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="View\Level2.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="View\Level3.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="View\Level4.cs">
+        <SubType>Form</SubType>
+      </Compile>
     </ItemGroup>
     
     <ItemGroup>
