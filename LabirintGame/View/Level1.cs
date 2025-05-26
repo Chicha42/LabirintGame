@@ -25,15 +25,6 @@ namespace LabirintGame.View
         private bool _isPlayerMoving;
         private int _playerDirection;
         
-        //Анимация врага
-        private Bitmap _enemySpriteSheet;
-        private const int EnemySpriteSize = 64;
-        private const int EnemyFramesPerDirection = 6;
-        private int _enemyAnimationFrame;
-        private int _enemyAnimationTick;
-        private const int EnemyFrameChangeRate = 10;
-
-        
         void IGameView.Invalidate() => Invalidate();
         void IGameView.BeginInvoke(Action action) => BeginInvoke(action);
         
@@ -47,7 +38,7 @@ namespace LabirintGame.View
             Resize += (_, _) => Invalidate();
             LoadTextures();
 
-            _controller = new GameController(this, 0,11,11,0, 5)
+            _controller = new GameController(this, 0, 0,11,11,0, 5)
             {
                 _onWin = () =>
                 {
@@ -104,15 +95,8 @@ namespace LabirintGame.View
         {
             _tileTextures[TileType.Wall] = LoadTexture("Assets/wall.png");
             _tileTextures[TileType.Floor] = LoadTexture("Assets/floor.png");
-            _tileTextures[TileType.KeyBlue] = LoadTexture("Assets/BlueKey.png");
-            _tileTextures[TileType.KeyGreen] = LoadTexture("Assets/GreenKey.png");
-            _tileTextures[TileType.KeyRed] = LoadTexture("Assets/RedKey.png");
-            _tileTextures[TileType.DoorGreen] = LoadTexture("Assets/GreenDoor.png");
-            _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
-            _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
             _tileTextures[TileType.Finish] = LoadTexture("Assets/Finish.png");
             _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
-            _enemySpriteSheet = new Bitmap("Assets/OrcWalk.png");
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -155,8 +139,6 @@ namespace LabirintGame.View
             MazePaint(maze, centerX, centerY, g);
 
             PlayerPaint(centerX, centerY, g);
-
-            EnemyPaint(g);
             
             BordersPaint(g, sideBrush);
 
@@ -237,49 +219,6 @@ namespace LabirintGame.View
                 ClientSize.Height);
         }
 
-        private void EnemyPaint(Graphics g)
-        {
-            
-            _enemyAnimationTick++;
-            foreach (var en in _controller.Enemies)
-            {
-                var enemyDirection = (int)en.Direction;
-                float x = Width / 2;
-                float y = Height / 2;
-                var sx = x - (en.DrawX - _controller.CameraX) * CellSize;
-                var sy = y - (en.DrawY - _controller.CameraY) * CellSize;
-                
-                if (Math.Abs(en.X - _controller.Player.X) + Math.Abs(en.Y - _controller.Player.Y) <= 1)
-                {
-                    if (enemyDirection <= 1)
-                        _enemyAnimationFrame = 1;
-                    else
-                        _enemyAnimationFrame = 2;
-                }
-                else
-                {
-                    
-                    if (_enemyAnimationTick >= EnemyFrameChangeRate)
-                    {
-                        _enemyAnimationTick = 0;
-                        _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
-                    }
-                }
-                
-                var srcRectE = new Rectangle(
-                    _enemyAnimationFrame * EnemySpriteSize,
-                    enemyDirection * EnemySpriteSize,
-                    EnemySpriteSize, EnemySpriteSize);
-
-                var destRectE = new RectangleF(
-                    sx - CellSize * 0.75f,
-                    sy - CellSize * 0.75f,
-                    CellSize*1.5f, CellSize*1.5f);
-
-                g.DrawImage(_enemySpriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
-            }
-        }
-
         private void HealthBarPaint(Graphics g)
         {
             var barWidth = 400;
@@ -293,7 +232,7 @@ namespace LabirintGame.View
 
             g.FillRectangle(Brushes.Gray, healthBarX, healthBarY, barWidth, barHeight);
 
-            using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0))) // Dark red
+            using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0)))
             {
                 g.FillRectangle(healthBrush, healthBarX, healthBarY, barWidth * healthRatio, barHeight);
             }

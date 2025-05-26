@@ -76,6 +76,21 @@ namespace LabirintGame.Model
             DrawY = Lerp(_moveData.fromY, _moveData.toY, _moveProgress);
         }
         
+        public void FacePlayer(int playerX, int playerY)
+        {
+            var dx = playerX - X;
+            var dy = playerY - Y;
+
+            if (Math.Abs(dx) > Math.Abs(dy))
+            {
+                Direction = dx > 0 ? Direction.Right : Direction.Left;
+            }
+            else
+            {
+                Direction = dy > 0 ? Direction.Down : Direction.Up;
+            }
+        }
+        
         private static float Lerp(float a, float b, float t)
         {
             return a + (b - a) * t;

@@ -495,3 +495,11 @@ C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\EnemyTutor3.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\OrcWalk.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\Prologue.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\OrcAttack.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\InvPurpleKey.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\Orc2attack.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\Orc2Walk.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\Orc3Attack.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\Orc3Walk.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\PurpleDoor.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\PurpleKey.png

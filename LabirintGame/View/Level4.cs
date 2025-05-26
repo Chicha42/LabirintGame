@@ -8,7 +8,7 @@ namespace LabirintGame.View
     public sealed partial class Level4 : Form, IGameView
     {
         private readonly GameController _controller;
-        private const int CellSize = 200;
+        private const int CellSize = 100;
         private readonly Timer _timer = new();
         private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
         private Bitmap _wall, _floor, _blueKey;
@@ -27,11 +27,14 @@ namespace LabirintGame.View
         
         //Анимация врага
         private Bitmap _enemySpriteSheet;
+        private Bitmap _enemyAttackSpriteSheet;
         private const int EnemySpriteSize = 64;
         private const int EnemyFramesPerDirection = 6;
         private int _enemyAnimationFrame;
         private int _enemyAnimationTick;
         private const int EnemyFrameChangeRate = 10;
+        private const int EnemyAttackFramesPerDirection = 8;
+        private const int EnemyAttackFrameChangeRate = 4;
 
         
         void IGameView.Invalidate() => Invalidate();
@@ -47,7 +50,7 @@ namespace LabirintGame.View
             Resize += (_, _) => Invalidate();
             LoadTextures();
 
-            _controller = new GameController(this, 3,25,25,3, 20)
+            _controller = new GameController(this, 3, 20,25,25,4, 1)
             {
                 _onWin = () =>
                 {
@@ -107,12 +110,15 @@ namespace LabirintGame.View
             _tileTextures[TileType.KeyBlue] = LoadTexture("Assets/BlueKey.png");
             _tileTextures[TileType.KeyGreen] = LoadTexture("Assets/GreenKey.png");
             _tileTextures[TileType.KeyRed] = LoadTexture("Assets/RedKey.png");
+            _tileTextures[TileType.KeyPurple] = LoadTexture("Assets/PurpleKey.png");
             _tileTextures[TileType.DoorGreen] = LoadTexture("Assets/GreenDoor.png");
             _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
             _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
+            _tileTextures[TileType.DoorPurple] = LoadTexture("Assets/PurpleDoor.png");
             _tileTextures[TileType.Finish] = LoadTexture("Assets/Finish.png");
             _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
-            _enemySpriteSheet = new Bitmap("Assets/OrcWalk.png");
+            _enemySpriteSheet = new Bitmap("Assets/Orc3Walk.png");
+            _enemyAttackSpriteSheet = new Bitmap("Assets/Orc3Attack.png");
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -157,7 +163,7 @@ namespace LabirintGame.View
             PlayerPaint(centerX, centerY, g);
 
             EnemyPaint(g);
-            
+                
             BordersPaint(g, sideBrush);
 
             HealthBarPaint(g);
@@ -248,22 +254,17 @@ namespace LabirintGame.View
                 float y = Height / 2;
                 var sx = x - (en.DrawX - _controller.CameraX) * CellSize;
                 var sy = y - (en.DrawY - _controller.CameraY) * CellSize;
+                var isAttacking = Math.Abs(en.X - _controller.Player.X) + 
+                    Math.Abs(en.Y - _controller.Player.Y) <= 1;
                 
-                if (Math.Abs(en.X - _controller.Player.X) + Math.Abs(en.Y - _controller.Player.Y) <= 1)
+                var spriteSheet = isAttacking ? _enemyAttackSpriteSheet : _enemySpriteSheet;
+                var frames = isAttacking ? EnemyAttackFramesPerDirection : EnemyFramesPerDirection;
+                var frameRate = isAttacking ? EnemyAttackFrameChangeRate : EnemyFrameChangeRate;
+                
+                if (_enemyAnimationTick >= frameRate)
                 {
-                    if (enemyDirection <= 1)
-                        _enemyAnimationFrame = 1;
-                    else
-                        _enemyAnimationFrame = 2;
-                }
-                else
-                {
-                    
-                    if (_enemyAnimationTick >= EnemyFrameChangeRate)
-                    {
-                        _enemyAnimationTick = 0;
-                        _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
-                    }
+                    _enemyAnimationTick = 0;
+                    _enemyAnimationFrame = (_enemyAnimationFrame + 1) % frames;
                 }
                 
                 var srcRectE = new Rectangle(
@@ -273,10 +274,10 @@ namespace LabirintGame.View
 
                 var destRectE = new RectangleF(
                     sx - CellSize * 0.75f,
-                    sy - CellSize * 0.75f,
+                    sy - CellSize * 0.6f,
                     CellSize*1.5f, CellSize*1.5f);
 
-                g.DrawImage(_enemySpriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
+                g.DrawImage(spriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
             }
         }
 
@@ -293,7 +294,7 @@ namespace LabirintGame.View
 
             g.FillRectangle(Brushes.Gray, healthBarX, healthBarY, barWidth, barHeight);
 
-            using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0))) // Dark red
+            using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0)))
             {
                 g.FillRectangle(healthBrush, healthBarX, healthBarY, barWidth * healthRatio, barHeight);
             }
@@ -316,7 +317,7 @@ namespace LabirintGame.View
             }
         
             var keySize = 80;
-            var spacing = 20;
+            var spacing = 15;
             var startX = xPos + spacing;
             var startY = yPos + (panelHeight - keySize) / 2;
 
@@ -332,6 +333,7 @@ namespace LabirintGame.View
         {
             return keyId switch
             {
+                7 => LoadTexture("Assets/InvPurpleKey.png"),
                 8 => LoadTexture("Assets/InvGreenKey.png"),
                 9 => LoadTexture("Assets/InvRedKey.png"),
                 10 => LoadTexture("Assets/InvBlueKey.png"),
@@ -363,9 +365,11 @@ namespace LabirintGame.View
                 0 => TileType.Wall,
                 1 => TileType.Floor,
                 3 => TileType.Finish,
+                7 => TileType.KeyPurple,
                 8 => TileType.KeyGreen,
                 9 => TileType.KeyRed,
                 10 => TileType.KeyBlue,
+                17 => TileType.DoorPurple,
                 18 => TileType.DoorGreen,
                 19 => TileType.DoorRed,
                 20 => TileType.DoorBlue,

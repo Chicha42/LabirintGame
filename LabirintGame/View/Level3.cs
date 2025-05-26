@@ -27,11 +27,14 @@ namespace LabirintGame.View
         
         //Анимация врага
         private Bitmap _enemySpriteSheet;
+        private Bitmap _enemyAttackSpriteSheet;
         private const int EnemySpriteSize = 64;
         private const int EnemyFramesPerDirection = 6;
         private int _enemyAnimationFrame;
         private int _enemyAnimationTick;
         private const int EnemyFrameChangeRate = 10;
+        private const int EnemyAttackFramesPerDirection = 8;
+        private const int EnemyAttackFrameChangeRate = 4;
 
         
         void IGameView.Invalidate() => Invalidate();
@@ -47,7 +50,7 @@ namespace LabirintGame.View
             Resize += (_, _) => Invalidate();
             LoadTextures();
 
-            _controller = new GameController(this, 2,21,21,2, 15)
+            _controller = new GameController(this, 2, 10,21,21,2, 15)
             {
                 _onWin = () =>
                 {
@@ -112,7 +115,8 @@ namespace LabirintGame.View
             _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
             _tileTextures[TileType.Finish] = LoadTexture("Assets/Finish.png");
             _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
-            _enemySpriteSheet = new Bitmap("Assets/OrcWalk.png");
+            _enemySpriteSheet = new Bitmap("Assets/Orc2Walk.png");
+            _enemyAttackSpriteSheet = new Bitmap("Assets/Orc2Attack.png");
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -248,22 +252,17 @@ namespace LabirintGame.View
                 float y = Height / 2;
                 var sx = x - (en.DrawX - _controller.CameraX) * CellSize;
                 var sy = y - (en.DrawY - _controller.CameraY) * CellSize;
+                var isAttacking = Math.Abs(en.X - _controller.Player.X) + 
+                    Math.Abs(en.Y - _controller.Player.Y) <= 1;
                 
-                if (Math.Abs(en.X - _controller.Player.X) + Math.Abs(en.Y - _controller.Player.Y) <= 1)
+                var spriteSheet = isAttacking ? _enemyAttackSpriteSheet : _enemySpriteSheet;
+                var frames = isAttacking ? EnemyAttackFramesPerDirection : EnemyFramesPerDirection;
+                var frameRate = isAttacking ? EnemyAttackFrameChangeRate : EnemyFrameChangeRate;
+                
+                if (_enemyAnimationTick >= frameRate)
                 {
-                    if (enemyDirection <= 1)
-                        _enemyAnimationFrame = 1;
-                    else
-                        _enemyAnimationFrame = 2;
-                }
-                else
-                {
-                    
-                    if (_enemyAnimationTick >= EnemyFrameChangeRate)
-                    {
-                        _enemyAnimationTick = 0;
-                        _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
-                    }
+                    _enemyAnimationTick = 0;
+                    _enemyAnimationFrame = (_enemyAnimationFrame + 1) % frames;
                 }
                 
                 var srcRectE = new Rectangle(
@@ -273,10 +272,10 @@ namespace LabirintGame.View
 
                 var destRectE = new RectangleF(
                     sx - CellSize * 0.75f,
-                    sy - CellSize * 0.75f,
+                    sy - CellSize * 0.6f,
                     CellSize*1.5f, CellSize*1.5f);
 
-                g.DrawImage(_enemySpriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
+                g.DrawImage(spriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
             }
         }
 
@@ -293,7 +292,7 @@ namespace LabirintGame.View
 
             g.FillRectangle(Brushes.Gray, healthBarX, healthBarY, barWidth, barHeight);
 
-            using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0))) // Dark red
+            using (var healthBrush = new SolidBrush(Color.FromArgb(139, 0, 0)))
             {
                 g.FillRectangle(healthBrush, healthBarX, healthBarY, barWidth * healthRatio, barHeight);
             }

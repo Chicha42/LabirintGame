@@ -15,7 +15,7 @@ namespace LabirintGame.Model
             {0, Color.Red },    
             {1, Color.Green},  
             {2, Color.Blue},  
-            
+            {3, Color.Purple}
         };
 
         private static readonly Dictionary<int, Color> DoorColors = new()
@@ -23,6 +23,7 @@ namespace LabirintGame.Model
             {0, Color.DarkRed},
             {1, Color.DarkGreen},
             {2, Color.DarkBlue},
+            {3, Color.DarkViolet}
         };
 
         public Maze(int width, int height, int numKeys, int branchesCount)
@@ -89,7 +90,7 @@ namespace LabirintGame.Model
                 if ((CountWallsAround(x, y) == 2 && cells.Count < 3) || (CountWallsAround(x, y) >= 2 && cells.Count >= 3))
                     cells.Add((x, y));
 
-                if (cells.Count == 6) break;
+                if (cells.Count == keys.Count + doors.Count) break;
             }
             
             var cellsWithDistances = cells

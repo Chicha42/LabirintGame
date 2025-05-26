@@ -61,18 +61,14 @@ namespace LabirintGame.Model
 
         private void CheckForCollectables(int dy, int dx)
         {
-            if (_maze.Grid[Y, X] == 10 ||
-                _maze.Grid[Y, X] == 9 ||
-                _maze.Grid[Y, X] == 8)
+            if (_maze.Grid[Y, X] >= 7 && _maze.Grid[Y, X] <= 10)
             {
                 CollectedKeys.Add(new Key(_maze.Grid[Y, X], 
-                    _maze.KeyColors[_maze.Grid[Y, X]-8], X, Y));
+                    _maze.KeyColors[_maze.Grid[Y, X]-7], X, Y));
                 _maze.Grid[Y, X] = 1;
             }
 
-            if (_maze.Grid[Y + dy, X + dx] == 20 ||
-                _maze.Grid[Y + dy, X + dx] == 19 ||
-                _maze.Grid[Y + dy, X + dx] == 18)
+            if (_maze.Grid[Y + dy, X + dx] >= 17 && _maze.Grid[Y + dy, X + dx] <= 20)
             {
                 foreach (var t in CollectedKeys.Where(t => t.Id + 10 == _maze.Grid[Y + dy, X + dx]).ToList())
                 {
@@ -89,7 +85,7 @@ namespace LabirintGame.Model
                 return false;
             
             var cell = _maze.Grid[y, x];
-            return cell != 0 && cell != 18 && cell != 19 && cell != 20; 
+            return cell != 0 && cell != 17 && cell != 18 && cell != 19 && cell != 20; 
         }
         private bool InBounds(int x, int y)
         {

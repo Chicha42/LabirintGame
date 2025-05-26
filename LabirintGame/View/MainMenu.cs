@@ -29,7 +29,7 @@ public partial class MainMenu : Form
 
     private void trainingButton_click(object? sender, EventArgs e)
     {
-        var trainingForm = new Training();
+        var trainingForm = new Tutorial();
         trainingForm.Show();
         Hide();
     }

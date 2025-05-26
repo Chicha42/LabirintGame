@@ -8,8 +8,10 @@ namespace LabirintGame.Model
         KeyBlue,
         KeyRed,
         KeyGreen,
+        KeyPurple,
         DoorBlue,
         DoorRed,
-        DoorGreen
+        DoorGreen,
+        DoorPurple
     }
 }

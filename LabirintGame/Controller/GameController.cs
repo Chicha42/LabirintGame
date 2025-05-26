@@ -17,7 +17,7 @@ public class GameController
     public IReadOnlyList<Enemy> Enemies => _model.Enemies;
     public Action _onWin { get; set; }
         
-    public GameController(IGameView view, int enemyCount, int mazeWidth, int mazeHeight, int numKeys, int branchesCount)
+    public GameController(IGameView view, int enemyCount, int enemyDamage, int mazeWidth, int mazeHeight, int numKeys, int branchesCount)
     {
         _view = view;
         _model = new GameModel(mazeWidth, mazeHeight, numKeys, branchesCount);
@@ -26,10 +26,10 @@ public class GameController
         CameraX = _model.Player.DrawX;
         CameraY = _model.Player.DrawY;
 
-        SpawnEnemies(enemyCount);
+        SpawnEnemies(enemyCount, enemyDamage);
     }
         
-    public GameController(IGameView view, int[,] customGrid, int enemyCount)
+    public GameController(IGameView view, int[,] customGrid, int enemyCount, int enemyDamage)
     {
         _view = view;
         _model = new GameModel(customGrid);
@@ -38,10 +38,10 @@ public class GameController
         CameraX = _model.Player.DrawX;
         CameraY = _model.Player.DrawY;
 
-        SpawnEnemies(enemyCount);
+        SpawnEnemies(enemyCount, enemyDamage);
     }
 
-    private void SpawnEnemies(int enemyCount)
+    private void SpawnEnemies(int enemyCount, int damage)
     {
         var rnd = _model.Maze.Random;
         var empty = _model.Maze.GetEmptyCells();
@@ -49,7 +49,7 @@ public class GameController
         for (var i = 0; i < enemyCount; i++)
         {
             var (x, y) = empty[rnd.Next(empty.Count)];
-            _model.Enemies.Add(new Enemy(_model.Maze, 50, 5, x, y));
+            _model.Enemies.Add(new Enemy(_model.Maze, 50, damage, x, y));
         }
     }
 
@@ -137,6 +137,8 @@ public class GameController
 
             if (isClose && enemy.CanDealDamage)
             {
+                enemy.FacePlayer(Player.X, Player.Y);
+                
                 Player.Health -= enemy.Damage;
                 enemy.CanDealDamage = false;
 
