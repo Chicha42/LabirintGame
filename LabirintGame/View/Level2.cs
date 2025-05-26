@@ -7,7 +7,7 @@ namespace LabirintGame.View
 {
     public sealed partial class Level2 : Form, IGameView
     {
-        private readonly GameController _controller;
+        private GameController _controller;
         private const int CellSize = 200;
         private readonly Timer _timer = new();
         private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
@@ -59,6 +59,12 @@ namespace LabirintGame.View
                         nextForm.Show();
                         Close();
                     }
+                },
+                
+                RestartGame = () =>
+                {
+                    Controls.Clear();
+                    InitializeGame();
                 }
             };
 
@@ -101,6 +107,27 @@ namespace LabirintGame.View
                 Invalidate();
             };  
             _timer.Start();
+        }
+        
+        private void InitializeGame()
+        {
+            _controller = new GameController(this, 1, 7,15,15,1, 10)
+            {
+                _onWin = () =>
+                {
+                    var nextForm = new Level3();
+                    nextForm.Show();
+                    Close();
+                },
+
+                RestartGame = () =>
+                {
+                    BeginInvoke((Action)(() =>
+                    {
+                        InitializeGame();
+                    }));
+                }
+            };
         }
 
         private void LoadTextures()
@@ -256,13 +283,12 @@ namespace LabirintGame.View
                     Math.Abs(en.Y - _controller.Player.Y) <= 1;
                 
                 var spriteSheet = isAttacking ? _enemyAttackSpriteSheet : _enemySpriteSheet;
-                var frames = isAttacking ? EnemyAttackFramesPerDirection : EnemyFramesPerDirection;
                 var frameRate = isAttacking ? EnemyAttackFrameChangeRate : EnemyFrameChangeRate;
                 
                 if (_enemyAnimationTick >= frameRate)
                 {
                     _enemyAnimationTick = 0;
-                    _enemyAnimationFrame = (_enemyAnimationFrame + 1) % frames;
+                    _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
                 }
                 
                 var srcRectE = new Rectangle(

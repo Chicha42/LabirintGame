@@ -55,7 +55,8 @@ namespace LabirintGame.Model
                    _maze.Grid[y, x] != 0 &&
                    _maze.Grid[y, x] != 20 &&
                    _maze.Grid[y, x] != 19 &&
-                   _maze.Grid[y, x] != 18;
+                   _maze.Grid[y, x] != 18 && 
+                   _maze.Grid[y,x] != 17;
         }
         
         public void Update(float deltaTime)

@@ -1,4 +1,5 @@
 using System.Drawing.Drawing2D;
+using System.Media;
 using LabirintGame.Model;
 using LabirintGame.Controller;
 using Timer = System.Windows.Forms.Timer;
@@ -14,6 +15,7 @@ namespace LabirintGame.View
         private Bitmap _wall, _floor, _blueKey;
         private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
         public Form GetForm() => this;
+        private SoundPlayer _music;
         
         //Анимация главного героя
         private Bitmap _playerSpriteSheet;
@@ -37,6 +39,9 @@ namespace LabirintGame.View
             KeyPreview = true;
             Resize += (_, _) => Invalidate();
             LoadTextures();
+            
+            _music = new SoundPlayer("Assets/GameMusic.wav");
+            _music.PlayLooping();
 
             _controller = new GameController(this, 0, 0,11,11,0, 5)
             {

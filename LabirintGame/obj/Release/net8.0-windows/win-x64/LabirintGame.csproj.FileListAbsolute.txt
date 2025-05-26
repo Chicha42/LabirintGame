@@ -503,3 +503,6 @@ C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\Orc3Walk.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\PurpleDoor.png
 C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\PurpleKey.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\GameOver.png
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\MainMenuMusic.wav
+C:\Users\Камилла\RiderProjects\LabirintGame\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\GameMusic.wav

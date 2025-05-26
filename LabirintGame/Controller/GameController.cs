@@ -3,7 +3,6 @@ using LabirintGame.View;
 using Timer = System.Windows.Forms.Timer;
 
 namespace LabirintGame.Controller;
-
 public class GameController
 {
     private readonly GameModel _model;
@@ -16,6 +15,7 @@ public class GameController
     public Player Player => _model.Player;
     public IReadOnlyList<Enemy> Enemies => _model.Enemies;
     public Action _onWin { get; set; }
+    public Action RestartGame { get; set; }
         
     public GameController(IGameView view, int enemyCount, int enemyDamage, int mazeWidth, int mazeHeight, int numKeys, int branchesCount)
     {
@@ -121,13 +121,18 @@ public class GameController
                     var rnd = new Random();
                     var dirs = new[] { (1, 0), (-1, 0), (0, 1), (0, -1) }
                         .OrderBy(_ => rnd.Next()).ToArray();
-                    foreach (var (dx0,dy0) in dirs)
-                        if (_model.Maze.Grid[enemy.Y + dy0, enemy.X + dx0] > 0)
+                    foreach (var (dx0, dy0) in dirs)
+                    {
+                        if (InBounds(enemy.Y + dy0, enemy.X + dx0))
                         {
-                            UpdateDirection(enemy, dx0, dy0);
-                            move = (dx0,dy0);
-                            break;
+                            if (_model.Maze.Grid[enemy.Y + dy0, enemy.X + dx0] > 0)
+                            {
+                                UpdateDirection(enemy, dx0, dy0);
+                                move = (dx0,dy0);
+                                break;
+                            }
                         }
+                    }
                 }
 
                 if (move != (0,0)) enemy.Move(move.dx, move.dy);
@@ -156,8 +161,29 @@ public class GameController
                 if (Player.Health <= 0)
                 {
                     _isGameOver = true;
-                    MessageBox.Show("Game Over!");
-                    _view.BeginInvoke((Action)(() => Application.Exit()));
+                    var currentForm = _view.GetForm();
+
+                    currentForm?.BeginInvoke((Action)(() =>
+                    {
+                        var gameOverForm = new GameOver();
+
+                        gameOverForm.OnRestartGame = () =>
+                        {
+                            // НЕ создаём новую форму и НЕ закрываем старую
+                            RestartGame?.Invoke(); // просто перезапуск игры в той же форме
+                            gameOverForm.Close();
+                        };
+
+                        gameOverForm.OnBackToMenu = () =>
+                        {
+                            var menuForm = new MainMenu();
+                            menuForm.Show();
+                            currentForm.Close(); // здесь можно закрыть, т.к. идём в меню
+                            gameOverForm.Close();
+                        };
+
+                        gameOverForm.Show();
+                    }));
                 }
             }
 
@@ -244,5 +270,10 @@ public class GameController
         {
             _model.Enemies.Add(new Enemy(_model.Maze, 50, 5, x, y));
         }
+    }
+    
+    private bool InBounds(int x, int y)
+    {
+        return x >= 0 && y >= 0 && x < Maze.Width && y < Maze.Height;
     }
 }

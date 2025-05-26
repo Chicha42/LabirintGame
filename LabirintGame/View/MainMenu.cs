@@ -1,8 +1,12 @@
+using System.Media;
+
 namespace LabirintGame.View;
 
 public partial class MainMenu : Form
 {
     private readonly Button[] _buttons;
+    private SoundPlayer _menuMusic;
+
     public MainMenu()
     {
         InitializeComponent();
@@ -19,6 +23,8 @@ public partial class MainMenu : Form
             CreateButton(822, exitButton_Click)
         ];
         
+        _menuMusic = new SoundPlayer("Assets/MainMenuMusic.wav");
+        _menuMusic.PlayLooping();
         
         foreach (var btn in _buttons)
             Controls.Add(btn);
@@ -31,6 +37,7 @@ public partial class MainMenu : Form
     {
         var trainingForm = new Tutorial();
         trainingForm.Show();
+        _menuMusic.Stop();
         Hide();
     }
 
@@ -66,6 +73,7 @@ public partial class MainMenu : Form
     {
         var gameForm = new Prologue();
         gameForm.Show();
+        _menuMusic.Stop();
         Hide();
     }
     
@@ -92,5 +100,4 @@ public partial class MainMenu : Form
         using var textImage = new Bitmap("Assets/MainMenu.png");
         g.DrawImage(textImage, 0, 0, ClientSize.Width, ClientSize.Height);
     }
-
 }

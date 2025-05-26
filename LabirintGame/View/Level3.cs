@@ -7,7 +7,7 @@ namespace LabirintGame.View
 {
     public sealed partial class Level3 : Form, IGameView
     {
-        private readonly GameController _controller;
+        private GameController _controller;
         private const int CellSize = 200;
         private readonly Timer _timer = new();
         private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
@@ -33,8 +33,7 @@ namespace LabirintGame.View
         private int _enemyAnimationFrame;
         private int _enemyAnimationTick;
         private const int EnemyFrameChangeRate = 10;
-        private const int EnemyAttackFramesPerDirection = 8;
-        private const int EnemyAttackFrameChangeRate = 4;
+        private const int EnemyAttackFrameChangeRate = 5;
 
         
         void IGameView.Invalidate() => Invalidate();
@@ -59,6 +58,12 @@ namespace LabirintGame.View
                         nextForm.Show();
                         Close();
                     }
+                },
+                
+                RestartGame = () =>
+                {
+                    Controls.Clear();
+                    InitializeGame();
                 }
             };
 
@@ -101,6 +106,27 @@ namespace LabirintGame.View
                 Invalidate();
             };  
             _timer.Start();
+        }
+        
+        private void InitializeGame()
+        {
+            _controller = new GameController(this, 2, 10,21,21,2, 15)
+            {
+                _onWin = () =>
+                {
+                    var nextForm = new Level4();
+                    nextForm.Show();
+                    Close();
+                },
+
+                RestartGame = () =>
+                {
+                    BeginInvoke((Action)(() =>
+                    {
+                        InitializeGame();
+                    }));
+                }
+            };
         }
 
         private void LoadTextures()
@@ -256,13 +282,12 @@ namespace LabirintGame.View
                     Math.Abs(en.Y - _controller.Player.Y) <= 1;
                 
                 var spriteSheet = isAttacking ? _enemyAttackSpriteSheet : _enemySpriteSheet;
-                var frames = isAttacking ? EnemyAttackFramesPerDirection : EnemyFramesPerDirection;
                 var frameRate = isAttacking ? EnemyAttackFrameChangeRate : EnemyFrameChangeRate;
                 
                 if (_enemyAnimationTick >= frameRate)
                 {
                     _enemyAnimationTick = 0;
-                    _enemyAnimationFrame = (_enemyAnimationFrame + 1) % frames;
+                    _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
                 }
                 
                 var srcRectE = new Rectangle(

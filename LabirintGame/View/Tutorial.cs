@@ -1,5 +1,6 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Media;
 using LabirintGame.Model;
 using LabirintGame.Controller;
 using Timer = System.Windows.Forms.Timer;
@@ -14,7 +15,7 @@ public sealed partial class Tutorial : Form, IGameView
     private Bitmap _wall, _floor, _blueKey;
     private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
     public Form GetForm() => this;
-        
+    
     //Анимация главного героя
     private Bitmap _playerSpriteSheet;
     private const int SpriteSize = 32;

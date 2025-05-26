@@ -7,7 +7,7 @@ namespace LabirintGame.View;
 
 public sealed partial class TutorialEnemy : Form, IGameView
 {
-    private readonly GameController _controller;
+    private GameController _controller;
     private const int CellSize = 200;
     private readonly Timer _timer = new();
     private bool _wPressed, _aPressed, _sPressed, _dPressed, _escPressed;
@@ -83,6 +83,12 @@ public sealed partial class TutorialEnemy : Form, IGameView
                     nextForm.Show();
                     Close();
                 }
+            },
+                
+            RestartGame = () =>
+            {
+                Controls.Clear();
+                InitializeGame();
             }
         };
 
@@ -129,6 +135,33 @@ public sealed partial class TutorialEnemy : Form, IGameView
             Invalidate();
         };  
         _timer.Start();
+    }
+
+    private void InitializeGame()
+    {
+        var trainingGrid = new[,]
+        {
+            {0,1,0,0,0,0,0,0,0,0,0,0,0},
+            {0,1,0,1,1,1,0,1,1,1,1,1,0},
+            {0,1,0,1,0,1,0,1,0,1,0,1,0},
+            {0,1,1,1,0,1,1,1,0,1,0,1,0},
+            {0,1,0,0,0,1,0,0,0,0,0,1,0},
+            {0,1,1,1,0,1,1,1,1,0,0,3,0},
+            {0,0,0,0,0,0,0,0,0,0,0,0,0}
+        };
+        
+        _controller = new GameController(this, trainingGrid, 0, 0)
+        {
+            _onWin = () =>
+            {
+                var nextForm = new Prologue();
+                nextForm.Show();
+                Close();
+            },
+
+            RestartGame = () => { BeginInvoke((Action)(() => { InitializeGame(); })); }
+        };
+        _controller.AddEnemyAtPosition(5, 5);
     }
 
     private void ShowTutorialImage(string imageKey)
@@ -334,13 +367,12 @@ public sealed partial class TutorialEnemy : Form, IGameView
                 Math.Abs(en.Y - _controller.Player.Y) <= 1;
                 
             var spriteSheet = isAttacking ? _enemyAttackSpriteSheet : _enemySpriteSheet;
-            var frames = isAttacking ? EnemyAttackFramesPerDirection : EnemyFramesPerDirection;
             var frameRate = isAttacking ? EnemyAttackFrameChangeRate : EnemyFrameChangeRate;
                 
             if (_enemyAnimationTick >= frameRate)
             {
                 _enemyAnimationTick = 0;
-                _enemyAnimationFrame = (_enemyAnimationFrame + 1) % frames;
+                _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
             }
                 
             var srcRectE = new Rectangle(
