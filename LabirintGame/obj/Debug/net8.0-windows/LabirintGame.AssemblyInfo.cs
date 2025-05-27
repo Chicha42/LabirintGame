@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LabirintGame")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+01082a4fde9c93b0463b270a44161cae9cf9363c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e08757c4e3fcce2705ab83506debce84b335ecba")]
 [assembly: System.Reflection.AssemblyProductAttribute("LabirintGame")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LabirintGame")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

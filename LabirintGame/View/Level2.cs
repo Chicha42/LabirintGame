@@ -40,6 +40,8 @@ namespace LabirintGame.View
         void IGameView.Invalidate() => Invalidate();
         void IGameView.BeginInvoke(Action action) => BeginInvoke(action);
         
+        
+        private bool[,] _visitedCells;
         public Level2()
         {   
             InitializeComponent();
@@ -49,7 +51,7 @@ namespace LabirintGame.View
             KeyPreview = true;
             Resize += (_, _) => Invalidate();
             LoadTextures();
-
+            
             _controller = new GameController(this, 1, 7,15,15,1, 10)
             {
                 _onWin = () =>
@@ -67,6 +69,8 @@ namespace LabirintGame.View
                     InitializeGame();
                 }
             };
+            
+            _visitedCells = new bool[_controller.Maze.Height, _controller.Maze.Width];
 
             Paint += MainForm_Paint;
             
@@ -107,6 +111,59 @@ namespace LabirintGame.View
                 Invalidate();
             };  
             _timer.Start();
+        }
+        
+        private void UpdateVisitedCells()
+        {
+            var playerX = _controller.Player.X;
+            var playerY = _controller.Player.Y;
+
+            if (playerX >= 0 && playerX < _visitedCells.GetLength(1) &&
+                playerY >= 0 && playerY < _visitedCells.GetLength(0))
+            {
+                _visitedCells[playerY, playerX] = true;
+            }
+        }
+        
+        private void DrawMiniMap(Graphics g)
+        {
+            const int miniMapCellSize = 20;
+            const int margin = 20;
+
+            var mapWidth = _controller.Maze.Width * miniMapCellSize;
+            var mapHeight = _controller.Maze.Height * miniMapCellSize;
+
+            var startX = margin + mapWidth;
+            var startY = margin + mapHeight;
+
+            for (var y = 0; y < _controller.Maze.Height; y++)
+            {
+                for (var x = 0; x < _controller.Maze.Width; x++)
+                {
+                    if (!_visitedCells[y, x]) continue;
+
+                    var tileCode = _controller.Maze.Grid[y, x];
+                    var tileType = GetTileType(tileCode);
+
+                    Brush brush = tileType switch
+                    {
+                        TileType.Wall => Brushes.Gray,
+                        TileType.Floor => Brushes.White,
+                        TileType.KeyBlue or TileType.KeyGreen or TileType.KeyRed => Brushes.Blue,
+                        TileType.DoorBlue or TileType.DoorGreen or TileType.DoorRed => Brushes.Brown,
+                        _ => Brushes.Black
+                    };
+
+                    g.FillRectangle(brush, startX - x * miniMapCellSize, startY - y * miniMapCellSize, miniMapCellSize, miniMapCellSize);
+                }
+            }
+
+            // Отображение игрока
+            var playerX = _controller.Player.X;
+            var playerY = _controller.Player.Y;
+            g.FillRectangle(Brushes.Red, startX - playerX * miniMapCellSize, startY - playerY * miniMapCellSize, miniMapCellSize, miniMapCellSize);
+
+            g.DrawRectangle(Pens.Black, margin, margin, mapWidth, mapHeight);
         }
         
         private void InitializeGame()
@@ -194,6 +251,10 @@ namespace LabirintGame.View
             HealthBarPaint(g);
 
             DrawCollectedKeys(g);
+            
+            UpdateVisitedCells();
+            
+            DrawMiniMap(g);
         }
 
         private void MazePaint(Maze maze, int centerX, int centerY, Graphics g)

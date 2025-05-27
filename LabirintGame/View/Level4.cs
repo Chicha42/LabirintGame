@@ -49,7 +49,7 @@ namespace LabirintGame.View
             Resize += (_, _) => Invalidate();
             LoadTextures();
 
-            _controller = new GameController(this, 0, 20,9,9,4, 1)
+            _controller = new GameController(this, 3, 20,25,25,4, 20)
             {
                 _onWin = () =>
                 {

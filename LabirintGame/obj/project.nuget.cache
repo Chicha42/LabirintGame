@@ -1,13 +1,24 @@
 {
   "version": 2,
-  "dgSpecHash": "12oeaPyirms=",
+  "dgSpecHash": "lH4vEi2/smM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Камилла\\RiderProjects\\LabirintGame\\LabirintGame\\LabirintGame.csproj",
+  "projectFilePath": "D:\\Projects\\Rider Projects C#\\FearOfTheDungeon\\LabirintGame\\LabirintGame.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Камилла\\.nuget\\packages\\microsoft.net.illink.tasks\\8.0.15\\microsoft.net.illink.tasks.8.0.15.nupkg.sha512",
-    "C:\\Users\\Камилла\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.15\\microsoft.netcore.app.runtime.win-x64.8.0.15.nupkg.sha512",
-    "C:\\Users\\Камилла\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.15\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.15.nupkg.sha512",
-    "C:\\Users\\Камилла\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.15\\microsoft.aspnetcore.app.runtime.win-x64.8.0.15.nupkg.sha512"
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.net.illink.tasks\\8.0.8\\microsoft.net.illink.tasks.8.0.8.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\naudio\\2.2.1\\naudio.2.2.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\naudio.asio\\2.2.1\\naudio.asio.2.2.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\naudio.core\\2.2.1\\naudio.core.2.2.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\naudio.midi\\2.2.1\\naudio.midi.2.2.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\naudio.wasapi\\2.2.1\\naudio.wasapi.2.2.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\naudio.winforms\\2.2.1\\naudio.winforms.2.2.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\naudio.winmm\\2.2.1\\naudio.winmm.2.2.1.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.8\\microsoft.netcore.app.runtime.win-x64.8.0.8.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.8\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.8.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.8\\microsoft.aspnetcore.app.runtime.win-x64.8.0.8.nupkg.sha512"
   ],
   "logs": []
 }
