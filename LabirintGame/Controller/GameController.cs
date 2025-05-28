@@ -40,7 +40,8 @@ public class GameController
 
         SpawnEnemies(enemyCount, enemyDamage);
     }
-
+    
+    
     private void SpawnEnemies(int enemyCount, int damage)
     {
         var rnd = _model.Maze.Random;
@@ -169,8 +170,7 @@ public class GameController
 
                         gameOverForm.OnRestartGame = () =>
                         {
-                            // НЕ создаём новую форму и НЕ закрываем старую
-                            RestartGame?.Invoke(); // просто перезапуск игры в той же форме
+                            RestartGame?.Invoke();
                             gameOverForm.Close();
                         };
 
@@ -178,7 +178,7 @@ public class GameController
                         {
                             var menuForm = new MainMenu();
                             menuForm.Show();
-                            currentForm.Close(); // здесь можно закрыть, т.к. идём в меню
+                            currentForm.Close();
                             gameOverForm.Close();
                         };
 
@@ -276,4 +276,14 @@ public class GameController
     {
         return x >= 0 && y >= 0 && x < Maze.Width && y < Maze.Height;
     }
+    
+    public (int X, int Y) GetPlayerPosition() => (Player.X, Player.Y);
+    public int GetMazeWidth() => Maze.Width;
+    public int GetMazeHeight() => Maze.Height;
+    public Maze GetMaze() => Maze;
+    public (int CameraX, int CameraY) GetCameraPosition() => ((int)CameraX, (int)CameraY);
+    public List<Enemy> GetEnemies() => _model.Enemies;
+    public int GetPlayerHealth() => _model.Player.Health;
+    public List<Key> GetCollectedKeys() => _model.Player.CollectedKeys;
+    public bool IsPlayerMoving() => _model.Player.IsMoving;
 }

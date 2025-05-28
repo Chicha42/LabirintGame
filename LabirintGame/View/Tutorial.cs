@@ -119,15 +119,15 @@ public sealed partial class Tutorial : Form, IGameView
 
             _controller.MovePlayer(dx, dy);
 
-            _isPlayerMoving = _controller.Player.IsMoving;
+            _isPlayerMoving = _controller.IsPlayerMoving();
 
-            if (_controller.Player.X == 5 && _controller.Player.Y == 2 && _showedKeyTutorial == false)
+            if (_controller.GetPlayerPosition().X == 5 && _controller.GetPlayerPosition().Y == 2 && _showedKeyTutorial == false)
             {
                 ShowTutorialImage("keyTutorial");
                 _showedKeyTutorial = true;
             }
             
-            if (_controller.Player.X == 8 && _controller.Player.Y == 3 && _showedDoorTutorial == false)
+            if (_controller.GetPlayerPosition().X == 8 && _controller.GetPlayerPosition().Y == 3 && _showedDoorTutorial == false)
             {
                 ShowTutorialImage("doorTutorial");
                 _showedDoorTutorial = true;
@@ -184,7 +184,7 @@ public sealed partial class Tutorial : Form, IGameView
 
     private void Training_Paint(object? sender, PaintEventArgs e)
     {
-        var maze = _controller.Maze;
+        var maze = _controller.GetMaze();
         var g = e.Graphics;
         g.InterpolationMode = InterpolationMode.NearestNeighbor;
         g.PixelOffsetMode = PixelOffsetMode.Half;
@@ -251,8 +251,9 @@ public sealed partial class Tutorial : Form, IGameView
         {
             for (var x = 0; x < maze.Grid.GetLength(1); x++)
             {
-                var screenX = centerX - (x - _controller.CameraX) * CellSize;
-                var screenY = centerY - (y - _controller.CameraY) * CellSize;
+                var (cameraX, cameraY) = _controller.GetCameraPosition();
+                var screenX = centerX - (x - cameraX) * CellSize;
+                var screenY = centerY - (y - cameraY) * CellSize;
 
                 var tileCode = maze.Grid[y, x];
                 var tileType = GetTileType(tileCode);
@@ -316,15 +317,17 @@ public sealed partial class Tutorial : Form, IGameView
     {
             
         _enemyAnimationTick++;
-        foreach (var en in _controller.Enemies)
+        foreach (var en in _controller.GetEnemies())
         {
             var enemyDirection = (int)en.Direction;
             float x = Width / 2;
             float y = Height / 2;
-            var sx = x - (en.DrawX - _controller.CameraX) * CellSize;
-            var sy = y - (en.DrawY - _controller.CameraY) * CellSize;
-                
-            if (Math.Abs(en.X - _controller.Player.X) + Math.Abs(en.Y - _controller.Player.Y) <= 1)
+            var (cameraX, cameraY) = _controller.GetCameraPosition();
+            var (playerX, playerY) = _controller.GetPlayerPosition();
+            var sx = x - (en.DrawX - cameraX) * CellSize;
+            var sy = y - (en.DrawY - cameraY) * CellSize;
+            
+            if (Math.Abs(en.X - playerX) + Math.Abs(en.Y - playerY) <= 1)
             {
                 if (enemyDirection <= 1)
                     _enemyAnimationFrame = 1;
@@ -364,7 +367,7 @@ public sealed partial class Tutorial : Form, IGameView
         var healthBarX = margin;
         var healthBarY = ClientSize.Height/2 - barHeight/2;
 
-        var healthRatio = Math.Clamp(_controller.Player.Health / 100f, 0f, 1f);
+        var healthRatio = Math.Clamp(_controller.GetPlayerHealth() / 100f, 0f, 1f);
 
         g.FillRectangle(Brushes.Gray, healthBarX, healthBarY, barWidth, barHeight);
 
@@ -395,7 +398,7 @@ public sealed partial class Tutorial : Form, IGameView
         var startX = xPos + spacing;
         var startY = yPos + (panelHeight - keySize) / 2;
 
-        foreach (var key in _controller.Player.CollectedKeys)
+        foreach (var key in _controller.GetCollectedKeys())
         {
             var keyTexture = GetKeyTexture(key.Id);
             g.DrawImage(keyTexture, startX, startY, keySize, keySize);

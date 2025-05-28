@@ -49,23 +49,7 @@ namespace LabirintGame.View
             Resize += (_, _) => Invalidate();
             LoadTextures();
 
-            _controller = new GameController(this, 3, 20,25,25,4, 20)
-            {
-                _onWin = () =>
-                {
-                    {
-                        var nextForm = new MainMenu();
-                        nextForm.Show();
-                        Hide();
-                    }
-                },
-                
-                RestartGame = () =>
-                {
-                    Controls.Clear();
-                    InitializeGame();
-                }
-            };
+            InitializeGame();
 
             Paint += MainForm_Paint;
             
@@ -99,8 +83,8 @@ namespace LabirintGame.View
                 if (_escPressed) Application.Exit();
 
                 _controller.MovePlayer(dx, dy);
-                
-                _isPlayerMoving = _controller.Player.IsMoving;
+
+                _isPlayerMoving = _controller.IsPlayerMoving();
                 
                 _controller.Update();
                 Invalidate();
@@ -123,6 +107,7 @@ namespace LabirintGame.View
                 {
                     BeginInvoke((Action)(() =>
                     {
+                        Controls.Clear();
                         InitializeGame();
                     }));
                 }
@@ -174,7 +159,7 @@ namespace LabirintGame.View
 
         private void MainForm_Paint(object? sender, PaintEventArgs e)
         {
-            var maze = _controller.Maze;
+            var maze = _controller.GetMaze();
             var g = e.Graphics;
             g.InterpolationMode = InterpolationMode.NearestNeighbor;
             g.PixelOffsetMode = PixelOffsetMode.Half;
@@ -205,8 +190,9 @@ namespace LabirintGame.View
             {
                 for (var x = startX; x <= endX; x++)
                 {
-                    var screenX = centerX - (x - _controller.CameraX) * CellSize;
-                    var screenY = centerY - (y - _controller.CameraY) * CellSize;
+                    var (cameraX, cameraY) = _controller.GetCameraPosition();
+                    var screenX = centerX - (x - cameraX) * CellSize;
+                    var screenY = centerY - (y - cameraY) * CellSize;
 
                     if (x >= 0 && x < maze.Width && y >= 0 && y < maze.Height)
                     {
@@ -273,15 +259,17 @@ namespace LabirintGame.View
         {
             
             _enemyAnimationTick++;
-            foreach (var en in _controller.Enemies)
+            foreach (var en in _controller.GetEnemies())
             {
                 var enemyDirection = (int)en.Direction;
                 float x = Width / 2;
                 float y = Height / 2;
-                var sx = x - (en.DrawX - _controller.CameraX) * CellSize;
-                var sy = y - (en.DrawY - _controller.CameraY) * CellSize;
-                var isAttacking = Math.Abs(en.X - _controller.Player.X) + 
-                    Math.Abs(en.Y - _controller.Player.Y) <= 1;
+                var (cameraX, cameraY) = _controller.GetCameraPosition();
+                var (playerX, playerY) = _controller.GetPlayerPosition();
+                var sx = x - (en.DrawX - cameraX) * CellSize;
+                var sy = y - (en.DrawY - cameraY) * CellSize;
+                var isAttacking = Math.Abs(en.X - playerX) + 
+                    Math.Abs(en.Y - playerY) <= 1;
                 
                 var spriteSheet = isAttacking ? _enemyAttackSpriteSheet : _enemySpriteSheet;
                 var frameRate = isAttacking ? EnemyAttackFrameChangeRate : EnemyFrameChangeRate;
@@ -315,7 +303,7 @@ namespace LabirintGame.View
             var healthBarX = margin;
             var healthBarY = ClientSize.Height/2 - barHeight/2;
 
-            var healthRatio = Math.Clamp(_controller.Player.Health / 100f, 0f, 1f);
+            var healthRatio = Math.Clamp(_controller.GetPlayerHealth()/ 100f, 0f, 1f);
 
             g.FillRectangle(Brushes.Gray, healthBarX, healthBarY, barWidth, barHeight);
 
@@ -346,7 +334,7 @@ namespace LabirintGame.View
             var startX = xPos + spacing;
             var startY = yPos + (panelHeight - keySize) / 2;
 
-            foreach (var key in _controller.Player.CollectedKeys)
+            foreach (var key in _controller.GetCollectedKeys())
             {
                 var keyTexture = GetKeyTexture(key.Id);
                 g.DrawImage(keyTexture, startX, startY, keySize, keySize);
@@ -371,9 +359,10 @@ namespace LabirintGame.View
             var visibleCellsX = (int)Math.Ceiling(ClientSize.Width / (float)CellSize) + 2;
             var visibleCellsY = (int)Math.Ceiling(ClientSize.Height / (float)CellSize) + 2;
 
+            var (cameraX, cameraY) = _controller.GetCameraPosition();
             
-            var startX = (int)Math.Floor(_controller.CameraX - visibleCellsX / 2f);
-            var startY = (int)Math.Floor(_controller.CameraY - visibleCellsY / 2f);
+            var startX = (int)Math.Floor(cameraX - visibleCellsX / 2f);
+            var startY = (int)Math.Floor(cameraY - visibleCellsY / 2f);
             var endX = startX + visibleCellsX;
             var endY = startY + visibleCellsY;
             
