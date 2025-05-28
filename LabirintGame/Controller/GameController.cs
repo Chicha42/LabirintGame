@@ -8,12 +8,9 @@ public class GameController
     private readonly GameModel _model;
     private readonly IGameView _view;
     private DateTime _lastUpdateTime;
-    public float CameraX { get; private set; }
-    public float CameraY { get; private set; }
     private bool _isGameOver;
     public Maze Maze => _model.Maze;
     public Player Player => _model.Player;
-    public IReadOnlyList<Enemy> Enemies => _model.Enemies;
     public Action _onWin { get; set; }
     public Action RestartGame { get; set; }
         
@@ -22,9 +19,6 @@ public class GameController
         _view = view;
         _model = new GameModel(mazeWidth, mazeHeight, numKeys, branchesCount);
         _lastUpdateTime = DateTime.Now;
-            
-        CameraX = _model.Player.DrawX;
-        CameraY = _model.Player.DrawY;
 
         SpawnEnemies(enemyCount, enemyDamage);
     }
@@ -34,9 +28,6 @@ public class GameController
         _view = view;
         _model = new GameModel(customGrid);
         _lastUpdateTime = DateTime.Now;
-    
-        CameraX = _model.Player.DrawX;
-        CameraY = _model.Player.DrawY;
 
         SpawnEnemies(enemyCount, enemyDamage);
     }
@@ -80,18 +71,10 @@ public class GameController
 
         _model.Player.Update(dt);
         UpdateEnemies(dt);
-        UpdateCamera(dt);
             
         _view.Invalidate();
     }
-
-    private void UpdateCamera(float dt)
-    {
-        const float speed = 5f;
-        CameraX = Lerp(CameraX, Player.DrawX, speed * dt);
-        CameraY = Lerp(CameraY, Player.DrawY, speed * dt);
-    }
-
+    
     private void UpdateEnemies(float dt)
     {
         foreach (var enemy in _model.Enemies)
@@ -282,7 +265,6 @@ public class GameController
     public int GetMazeWidth() => Maze.Width;
     public int GetMazeHeight() => Maze.Height;
     public Maze GetMaze() => Maze;
-    public (int CameraX, int CameraY) GetCameraPosition() => ((int)CameraX, (int)CameraY);
     public List<Enemy> GetEnemies() => _model.Enemies;
     public int GetPlayerHealth() => _model.Player.Health;
     public List<Key> GetCollectedKeys() => _model.Player.CollectedKeys;

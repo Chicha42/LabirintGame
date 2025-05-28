@@ -1022,3 +1022,5 @@ D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Release\net8.0-w
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Release\net8.0-windows\win-x64\NAudio.WinForms.dll
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Release\net8.0-windows\win-x64\NAudio.WinMM.dll
 D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\obj\Release\net8.0-windows\win-x64\LabirintGame.csproj.AssemblyReference.cache
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\MiniMapPlayer.png
+D:\Projects\Rider Projects C#\FearOfTheDungeon\LabirintGame\bin\Release\net8.0-windows\win-x64\Assets\MiniMap.png

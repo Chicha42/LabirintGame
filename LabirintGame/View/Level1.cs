@@ -18,9 +18,12 @@ namespace LabirintGame.View
         private SoundPlayer _music;
         private float _cameraX, _cameraY;
         private const float CameraSpeed = 0.1f;
+        private Bitmap _miniMapBackgroundTexture;
+        private bool[,] _visitedCells;
         
         //Анимация главного героя
         private Bitmap _playerSpriteSheet;
+        private Bitmap _miniMapPlayerTexture;
         private const int SpriteSize = 32;
         private const int FramesPerDirection = 4;
         private int _animationFrame;
@@ -45,7 +48,7 @@ namespace LabirintGame.View
             _music = new SoundPlayer("Assets/GameMusic.wav");
             _music.PlayLooping();
             
-            _controller = new GameController(this, 0, 0,11,11,0, 5)
+            _controller = new GameController(this, 0, 0,15,15,0, 5)
             {
                 _onWin = () =>
                 {
@@ -58,6 +61,8 @@ namespace LabirintGame.View
             };
 
             Paint += MainForm_Paint;
+            
+            _visitedCells = new bool[_controller.GetMazeHeight(), _controller.GetMazeWidth()];
             
             var (playerX, playerY) = _controller.GetPlayerDrawPosition();
             _cameraX = playerX;
@@ -112,6 +117,8 @@ namespace LabirintGame.View
             _tileTextures[TileType.Floor] = LoadTexture("Assets/floor.png");
             _tileTextures[TileType.Finish] = LoadTexture("Assets/Finish.png");
             _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
+            _miniMapPlayerTexture = LoadTexture("Assets/MiniMapPlayer.png");
+            _miniMapBackgroundTexture = LoadTexture("Assets/MiniMap.png");
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -160,6 +167,10 @@ namespace LabirintGame.View
             HealthBarPaint(g);
 
             DrawCollectedKeys(g);
+            
+            UpdateVisitedCells();
+            
+            DrawMiniMap(g);
         }
 
         private void MazePaint(Maze maze, int centerX, int centerY, Graphics g)
@@ -281,6 +292,100 @@ namespace LabirintGame.View
                 startX += keySize + spacing;
             }
         }
+        
+        private void DrawMiniMap(Graphics g)
+        {
+            const int miniMapCellSize = 20;
+            const int marginLeft = 80;
+            const int marginTop = 80;
+
+            var maze = _controller.GetMaze();
+
+            var mapWidth = maze.Width * miniMapCellSize;
+            var mapHeight = maze.Height * miniMapCellSize;
+
+            var startX = marginLeft + mapWidth;
+            var startY = marginTop + mapHeight;
+
+            if (_miniMapBackgroundTexture != null)
+            {
+                var backgroundWidth = _miniMapBackgroundTexture.Width;
+                var backgroundHeight = _miniMapBackgroundTexture.Height;
+
+                var backgroundX = marginLeft + (mapWidth - backgroundWidth) / 2;
+                var backgroundY = marginTop - backgroundHeight - 10;
+
+                g.DrawImage(_miniMapBackgroundTexture, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
+            }
+
+            for (var y = 0; y < maze.Height; y++)
+            {
+                for (var x = 0; x < maze.Width; x++)
+                {
+                    if (_tileTextures.TryGetValue(TileType.Wall, out var wallTexture))
+                    {
+                        g.DrawImage(wallTexture,
+                            startX - (x + 1) * miniMapCellSize,
+                            startY - (y + 1) * miniMapCellSize,
+                            miniMapCellSize,
+                            miniMapCellSize);
+                    }
+
+                    if (_visitedCells[y, x])
+                    {
+                        var tileCode = maze.Grid[y, x];
+                        var tileType = GetTileType(tileCode);
+
+                        if (_tileTextures.TryGetValue(tileType, out var texture))
+                        {
+                            g.DrawImage(texture,
+                                startX - (x + 1) * miniMapCellSize,
+                                startY - (y + 1) * miniMapCellSize,
+                                miniMapCellSize,
+                                miniMapCellSize);
+                        }
+                    }
+                }
+            }
+
+            var (playerX, playerY) = _controller.GetPlayerPosition();
+            g.DrawImage(_miniMapPlayerTexture,
+                startX - (playerX + 1) * miniMapCellSize,
+                startY - (playerY + 1) * miniMapCellSize,
+                miniMapCellSize,
+                miniMapCellSize);
+
+            g.DrawRectangle(new Pen(Color.FromArgb(42, 44, 64), 5), marginLeft, marginTop, mapWidth, mapHeight);
+        }
+        
+        private void UpdateVisitedCells()
+        {
+            var (playerX, playerY) = _controller.GetPlayerPosition();
+
+            if (playerX >= 0 && playerX < _visitedCells.GetLength(1) &&
+                playerY >= 0 && playerY < _visitedCells.GetLength(0))
+            {
+                _visitedCells[playerY, playerX] = true;
+            }
+            
+            int offsetX = 0, offsetY = 0;
+            switch (_playerDirection)
+            {
+                case 0: offsetY = -1; break;
+                case 1: offsetY = 1; break;
+                case 2: offsetX = -1; break;
+                case 3: offsetX = 1; break;
+            }
+
+            var visibleX = playerX + offsetX;
+            var visibleY = playerY + offsetY;
+
+            if (visibleX >= 0 && visibleX < _visitedCells.GetLength(1) &&
+                visibleY >= 0 && visibleY < _visitedCells.GetLength(0))
+            {
+                _visitedCells[visibleY, visibleX] = true;
+            }
+        }
 
         private Bitmap GetKeyTexture(int keyId)
         {
@@ -298,7 +403,7 @@ namespace LabirintGame.View
             var visibleCellsX = (int)Math.Ceiling(ClientSize.Width / (float)CellSize) + 2;
             var visibleCellsY = (int)Math.Ceiling(ClientSize.Height / (float)CellSize) + 2;
 
-            var (cameraX, cameraY) = _controller.GetCameraPosition();
+            var (cameraX, cameraY) = (_cameraX, _cameraY);
             
             var startX = (int)Math.Floor(cameraX - visibleCellsX / 2f);
             var startY = (int)Math.Floor(cameraY - visibleCellsY / 2f);
