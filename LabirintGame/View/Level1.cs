@@ -16,6 +16,8 @@ namespace LabirintGame.View
         private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
         public Form GetForm() => this;
         private SoundPlayer _music;
+        private float _cameraX, _cameraY;
+        private const float CameraSpeed = 0.1f;
         
         //Анимация главного героя
         private Bitmap _playerSpriteSheet;
@@ -42,7 +44,7 @@ namespace LabirintGame.View
             
             _music = new SoundPlayer("Assets/GameMusic.wav");
             _music.PlayLooping();
-
+            
             _controller = new GameController(this, 0, 0,11,11,0, 5)
             {
                 _onWin = () =>
@@ -56,6 +58,10 @@ namespace LabirintGame.View
             };
 
             Paint += MainForm_Paint;
+            
+            var (playerX, playerY) = _controller.GetPlayerDrawPosition();
+            _cameraX = playerX;
+            _cameraY = playerY;
             
             _timer.Interval = 10;
             _timer.Tick += (_, _) =>
@@ -89,6 +95,10 @@ namespace LabirintGame.View
                 _controller.MovePlayer(dx, dy);
                 
                 _isPlayerMoving = _controller.IsPlayerMoving();
+                
+                var (drawX, drawY) = _controller.GetPlayerDrawPosition();
+                _cameraX += (drawX - _cameraX) * CameraSpeed;
+                _cameraY += (drawY - _cameraY) * CameraSpeed;
                 
                 _controller.Update();
                 Invalidate();
@@ -160,9 +170,8 @@ namespace LabirintGame.View
             {
                 for (var x = startX; x <= endX; x++)
                 {
-                    var(cameraX, cameraY) = _controller.GetCameraPosition();
-                    var screenX = centerX - (x - cameraX) * CellSize;
-                    var screenY = centerY - (y - cameraY) * CellSize;
+                    var screenX = centerX - (x - _cameraX) * CellSize;
+                    var screenY = centerY - (y - _cameraY) * CellSize;
 
                     if (x >= 0 && x < maze.Width && y >= 0 && y < maze.Height)
                     {

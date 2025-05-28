@@ -278,6 +278,7 @@ public class GameController
     }
     
     public (int X, int Y) GetPlayerPosition() => (Player.X, Player.Y);
+    public (float DrawX, float DrawY) GetPlayerDrawPosition() => (Player.DrawX, Player.DrawY);
     public int GetMazeWidth() => Maze.Width;
     public int GetMazeHeight() => Maze.Height;
     public Maze GetMaze() => Maze;

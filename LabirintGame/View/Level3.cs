@@ -14,6 +14,8 @@ namespace LabirintGame.View
         private Bitmap _wall, _floor, _blueKey;
         private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
         public Form GetForm() => this;
+        private float _cameraX, _cameraY;
+        private const float CameraSpeed = 0.1f;
         
         //Анимация главного героя
         private Bitmap _playerSpriteSheet;
@@ -51,6 +53,10 @@ namespace LabirintGame.View
 
             InitializeGame();
 
+            var (playerX, playerY) = _controller.GetPlayerDrawPosition();
+            _cameraX = playerX;
+            _cameraY = playerY;
+            
             Paint += MainForm_Paint;
             
             _timer.Interval = 10;
@@ -85,6 +91,10 @@ namespace LabirintGame.View
                 _controller.MovePlayer(dx, dy);
                 
                 _isPlayerMoving = _controller.IsPlayerMoving();
+                
+                var (drawX, drawY) = _controller.GetPlayerDrawPosition();
+                _cameraX += (drawX - _cameraX) * CameraSpeed;
+                _cameraY += (drawY - _cameraY) * CameraSpeed;
                 
                 _controller.Update();
                 Invalidate();
@@ -188,9 +198,8 @@ namespace LabirintGame.View
             {
                 for (var x = startX; x <= endX; x++)
                 {
-                    var (cameraX, cameraY) = _controller.GetCameraPosition();
-                    var screenX = centerX - (x - cameraX) * CellSize;
-                    var screenY = centerY - (y - cameraY) * CellSize;
+                    var screenX = centerX - (x - _cameraX) * CellSize;
+                    var screenY = centerY - (y - _cameraY) * CellSize;
 
                     if (x >= 0 && x < maze.Width && y >= 0 && y < maze.Height)
                     {
@@ -255,14 +264,13 @@ namespace LabirintGame.View
 
         private void EnemyPaint(Graphics g)
         {
-            
             _enemyAnimationTick++;
             foreach (var en in _controller.GetEnemies())
             {
                 var enemyDirection = (int)en.Direction;
                 float x = Width / 2;
                 float y = Height / 2;
-                var (cameraX, cameraY) = _controller.GetCameraPosition();
+                var (cameraX, cameraY) = (_cameraX, _cameraY);
                 var (playerX, playerY) = _controller.GetPlayerPosition();
                 var sx = x - (en.DrawX - cameraX) * CellSize;
                 var sy = y - (en.DrawY - cameraY) * CellSize;

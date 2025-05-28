@@ -15,6 +15,8 @@ public sealed partial class Tutorial : Form, IGameView
     private Bitmap _wall, _floor, _blueKey;
     private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
     public Form GetForm() => this;
+    private float _cameraX, _cameraY;
+    private const float CameraSpeed = 0.1f;
     
     //Анимация главного героя
     private Bitmap _playerSpriteSheet;
@@ -25,14 +27,6 @@ public sealed partial class Tutorial : Form, IGameView
     private const int FrameChangeRate = 10;
     private bool _isPlayerMoving;
     private int _playerDirection;
-        
-    //Анимация врага
-    private Bitmap _enemySpriteSheet;
-    private const int EnemySpriteSize = 64;
-    private const int EnemyFramesPerDirection = 6;
-    private int _enemyAnimationFrame;
-    private int _enemyAnimationTick;
-    private const int EnemyFrameChangeRate = 10;
     
     //Для показа сообщений обучения
     private bool _showedKeyTutorial;
@@ -84,6 +78,10 @@ public sealed partial class Tutorial : Form, IGameView
             }
         };
         
+        var (playerX, playerY) = _controller.GetPlayerDrawPosition();
+        _cameraX = playerX;
+        _cameraY = playerY;
+        
         Paint += Training_Paint;
         
         _timer.Interval = 10;
@@ -120,6 +118,10 @@ public sealed partial class Tutorial : Form, IGameView
             _controller.MovePlayer(dx, dy);
 
             _isPlayerMoving = _controller.IsPlayerMoving();
+            
+            var (drawX, drawY) = _controller.GetPlayerDrawPosition();
+            _cameraX += (drawX - _cameraX) * CameraSpeed;
+            _cameraY += (drawY - _cameraY) * CameraSpeed;
 
             if (_controller.GetPlayerPosition().X == 5 && _controller.GetPlayerPosition().Y == 2 && _showedKeyTutorial == false)
             {
@@ -175,7 +177,6 @@ public sealed partial class Tutorial : Form, IGameView
         _tileTextures[TileType.DoorRed] = LoadTexture("Assets/RedDoor.png");
         _tileTextures[TileType.DoorBlue] = LoadTexture("Assets/BlueDoor.png");
         _playerSpriteSheet = new Bitmap("Assets/PlayerAnim.png");
-        _enemySpriteSheet = new Bitmap("Assets/OrcWalk.png");
         _tileTextures[TileType.Finish] = LoadTexture("Assets/Finish.png");
         _tutorialImages["welcome"] = LoadTexture("Assets/Welcome.png");
         _tutorialImages["keyTutorial"] = LoadTexture("Assets/KeyTutorial.png");
@@ -197,9 +198,7 @@ public sealed partial class Tutorial : Form, IGameView
         DrawMaze(maze, centerX, centerY, g);
 
         DrawPlayer(centerX, centerY, g);
-
-        DrawEnemy(g);
-            
+        
         DrawBorders(g, sideBrush);
 
         DrawHealthBar(g);
@@ -251,9 +250,8 @@ public sealed partial class Tutorial : Form, IGameView
         {
             for (var x = 0; x < maze.Grid.GetLength(1); x++)
             {
-                var (cameraX, cameraY) = _controller.GetCameraPosition();
-                var screenX = centerX - (x - cameraX) * CellSize;
-                var screenY = centerY - (y - cameraY) * CellSize;
+                var screenX = centerX - (x - _cameraX) * CellSize;
+                var screenY = centerY - (y - _cameraY) * CellSize;
 
                 var tileCode = maze.Grid[y, x];
                 var tileType = GetTileType(tileCode);
@@ -311,51 +309,6 @@ public sealed partial class Tutorial : Form, IGameView
             0f,
             CellSize*2.3f,
             ClientSize.Height);
-    }
-    
-    private void DrawEnemy(Graphics g)
-    {
-            
-        _enemyAnimationTick++;
-        foreach (var en in _controller.GetEnemies())
-        {
-            var enemyDirection = (int)en.Direction;
-            float x = Width / 2;
-            float y = Height / 2;
-            var (cameraX, cameraY) = _controller.GetCameraPosition();
-            var (playerX, playerY) = _controller.GetPlayerPosition();
-            var sx = x - (en.DrawX - cameraX) * CellSize;
-            var sy = y - (en.DrawY - cameraY) * CellSize;
-            
-            if (Math.Abs(en.X - playerX) + Math.Abs(en.Y - playerY) <= 1)
-            {
-                if (enemyDirection <= 1)
-                    _enemyAnimationFrame = 1;
-                else
-                    _enemyAnimationFrame = 2;
-            }
-            else
-            {
-                    
-                if (_enemyAnimationTick >= EnemyFrameChangeRate)
-                {
-                    _enemyAnimationTick = 0;
-                    _enemyAnimationFrame = (_enemyAnimationFrame + 1) % EnemyFramesPerDirection;
-                }
-            }
-            
-            var srcRectE = new Rectangle(
-                _enemyAnimationFrame * EnemySpriteSize,
-                enemyDirection * EnemySpriteSize,
-                EnemySpriteSize, EnemySpriteSize);
-
-            var destRectE = new RectangleF(
-                sx - CellSize * 0.75f,
-                sy - CellSize * 0.75f,
-                CellSize*1.5f, CellSize*1.5f);
-
-            g.DrawImage(_enemySpriteSheet, destRectE, srcRectE, GraphicsUnit.Pixel);
-        }
     }
     
     private void DrawHealthBar(Graphics g)

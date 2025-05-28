@@ -14,6 +14,8 @@ namespace LabirintGame.View
         private Bitmap _wall, _floor, _blueKey;
         private readonly Dictionary<TileType, Bitmap> _tileTextures = new();
         public Form GetForm() => this;
+        private float _cameraX, _cameraY;
+        private const float CameraSpeed = 0.1f;
         
         //Анимация главного героя
         private Bitmap _playerSpriteSheet;
@@ -55,6 +57,10 @@ namespace LabirintGame.View
             
             _visitedCells = new bool[_controller.GetMazeHeight(), _controller.GetMazeWidth()];
 
+            var (playerX, playerY) = _controller.GetPlayerDrawPosition();
+            _cameraX = playerX;
+            _cameraY = playerY;
+            
             Paint += MainForm_Paint;
             
             _timer.Interval = 10;
@@ -90,6 +96,10 @@ namespace LabirintGame.View
                 
                 _isPlayerMoving = _controller.IsPlayerMoving();
                 
+                var (drawX, drawY) = _controller.GetPlayerDrawPosition();
+                _cameraX += (drawX - _cameraX) * CameraSpeed;
+                _cameraY += (drawY - _cameraY) * CameraSpeed;
+                
                 _controller.Update();
                 Invalidate();
             };  
@@ -124,26 +134,40 @@ namespace LabirintGame.View
             {
                 for (var x = 0; x < maze.Width; x++)
                 {
-                    if (!_visitedCells[y, x]) continue;
-
-                    var tileCode = maze.Grid[y, x];
-                    var tileType = GetTileType(tileCode);
-
-                    Brush brush = tileType switch
+                    // По умолчанию отрисовываем текстуру стены
+                    if (_tileTextures.TryGetValue(TileType.Wall, out var wallTexture))
                     {
-                        TileType.Wall => Brushes.Gray,
-                        TileType.Floor => Brushes.White,
-                        TileType.KeyBlue or TileType.KeyGreen or TileType.KeyRed => Brushes.Blue,
-                        TileType.DoorBlue or TileType.DoorGreen or TileType.DoorRed => Brushes.Brown,
-                        _ => Brushes.Black
-                    };
+                        g.DrawImage(wallTexture,
+                            startX - (x + 1) * miniMapCellSize,
+                            startY - (y + 1) * miniMapCellSize,
+                            miniMapCellSize,
+                            miniMapCellSize);
+                    }
 
-                    g.FillRectangle(brush, startX - x * miniMapCellSize, startY - y * miniMapCellSize, miniMapCellSize, miniMapCellSize);
+                    // Если клетка посещена, заменяем текстуру на соответствующую
+                    if (_visitedCells[y, x])
+                    {
+                        var tileCode = maze.Grid[y, x];
+                        var tileType = GetTileType(tileCode);
+
+                        if (_tileTextures.TryGetValue(tileType, out var texture))
+                        {
+                            g.DrawImage(texture,
+                                startX - (x + 1) * miniMapCellSize,
+                                startY - (y + 1) * miniMapCellSize,
+                                miniMapCellSize,
+                                miniMapCellSize);
+                        }
+                    }
                 }
             }
-            
+
             var (playerX, playerY) = _controller.GetPlayerPosition();
-            g.FillRectangle(Brushes.Red, startX - playerX * miniMapCellSize, startY - playerY * miniMapCellSize, miniMapCellSize, miniMapCellSize);
+            g.FillRectangle(Brushes.Red,
+                startX - (playerX + 1) * miniMapCellSize,
+                startY - (playerY + 1) * miniMapCellSize,
+                miniMapCellSize,
+                miniMapCellSize);
 
             g.DrawRectangle(Pens.Black, margin, margin, mapWidth, mapHeight);
         }
@@ -248,9 +272,8 @@ namespace LabirintGame.View
             {
                 for (var x = startX; x <= endX; x++)
                 {
-                    var (cameraX, cameraY) = _controller.GetCameraPosition();
-                    var screenX = centerX - (x - cameraX) * CellSize;
-                    var screenY = centerY - (y - cameraY) * CellSize;
+                    var screenX = centerX - (x - _cameraX) * CellSize;
+                    var screenY = centerY - (y - _cameraY) * CellSize;
 
                     if (x >= 0 && x < maze.Width && y >= 0 && y < maze.Height)
                     {
@@ -315,14 +338,13 @@ namespace LabirintGame.View
 
         private void EnemyPaint(Graphics g)
         {
-            
             _enemyAnimationTick++;
             foreach (var en in _controller.GetEnemies())
             {
                 var enemyDirection = (int)en.Direction;
                 float x = Width / 2;
                 float y = Height / 2;
-                var (cameraX, cameraY) = _controller.GetCameraPosition();
+                var (cameraX, cameraY) = (_cameraX, _cameraY);
                 var (playerX, playerY) = _controller.GetPlayerPosition();
                 var sx = x - (en.DrawX - cameraX) * CellSize;
                 var sy = y - (en.DrawY - cameraY) * CellSize;
